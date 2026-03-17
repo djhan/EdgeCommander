@@ -1,6 +1,6 @@
 # ``EdgeCommander``
 
-<!--@START_MENU_TOKEN@-->Summary<!--@END_MENU_TOKEN@-->
+MacOS용 EdgeView의 단축키 설정을 제어하는 프레임웍.
 
 ## Overview
 

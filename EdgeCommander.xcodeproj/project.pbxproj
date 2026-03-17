@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		EED4B1132F68FA850099C659 /* EdgeCommander.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EED4B1072F68FA850099C659 /* EdgeCommander.framework */; };
+		EED4B1232F68FC7D0099C659 /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = EED4B1222F68FC7D0099C659 /* KeyboardShortcuts */; };
+		EED4B1262F68FF630099C659 /* EdgeCommonLib.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EED4B1252F68FF630099C659 /* EdgeCommonLib.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -23,6 +25,8 @@
 /* Begin PBXFileReference section */
 		EED4B1072F68FA850099C659 /* EdgeCommander.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = EdgeCommander.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		EED4B1122F68FA850099C659 /* EdgeCommanderTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EdgeCommanderTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		EED4B1252F68FF630099C659 /* EdgeCommonLib.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = EdgeCommonLib.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		EED4B1292F68FF720099C659 /* EdgeCommonLib.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = EdgeCommonLib.xcodeproj; path = ../EdgeCommonLib/EdgeCommonLib.xcodeproj; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -43,6 +47,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EED4B1262F68FF630099C659 /* EdgeCommonLib.framework in Frameworks */,
+				EED4B1232F68FC7D0099C659 /* KeyboardShortcuts in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -60,8 +66,10 @@
 		EED4B0FD2F68FA850099C659 = {
 			isa = PBXGroup;
 			children = (
+				EED4B1292F68FF720099C659 /* EdgeCommonLib.xcodeproj */,
 				EED4B1092F68FA850099C659 /* EdgeCommander */,
 				EED4B1162F68FA850099C659 /* EdgeCommanderTests */,
+				EED4B1242F68FF630099C659 /* Frameworks */,
 				EED4B1082F68FA850099C659 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -73,6 +81,14 @@
 				EED4B1122F68FA850099C659 /* EdgeCommanderTests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		EED4B1242F68FF630099C659 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				EED4B1252F68FF630099C659 /* EdgeCommonLib.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -106,6 +122,7 @@
 			);
 			name = EdgeCommander;
 			packageProductDependencies = (
+				EED4B1222F68FC7D0099C659 /* KeyboardShortcuts */,
 			);
 			productName = EdgeCommander;
 			productReference = EED4B1072F68FA850099C659 /* EdgeCommander.framework */;
@@ -161,6 +178,9 @@
 			);
 			mainGroup = EED4B0FD2F68FA850099C659;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				EED4B1212F68FC7D0099C659 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = EED4B1082F68FA850099C659 /* Products */;
 			projectDirPath = "";
@@ -480,6 +500,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		EED4B1212F68FC7D0099C659 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sindresorhus/KeyboardShortcuts";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.4.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		EED4B1222F68FC7D0099C659 /* KeyboardShortcuts */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = EED4B1212F68FC7D0099C659 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */;
+			productName = KeyboardShortcuts;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = EED4B0FE2F68FA850099C659 /* Project object */;
 }
