@@ -183,13 +183,13 @@ public class RecorderView: NSView {
         switch self.category {
         // 일단 단축키
         case .normal:
-            modifiers = self.commander?.modifierFlags ?? inputModifierFlags
+            modifiers = isRecording ? inputModifierFlags : (self.commander?.modifierFlags ?? NSEvent.ModifierFlags())
         // 전환 키: 이 경우는 아무런 단축키도 표시하지 않는다
         case .swap:
             modifiers = NSEvent.modifierFlags
         // 대체 단축키
         case .alternative:
-            modifiers = self.commander?.alternativeModifierFlags ?? inputModifierFlags
+            modifiers = isRecording ? inputModifierFlags : (self.commander?.alternativeModifierFlags ?? NSEvent.ModifierFlags())
         }
         for (i, text) in validModifiersFlagsText.enumerated() {
             let rect = NSRect(x: marginX + (fontSize * CGFloat(i)), y: marginY, width: fontSize, height: bounds.height)
@@ -198,19 +198,20 @@ public class RecorderView: NSView {
     }
 
     private func drawKeyCode(_ dirtyRext: NSRect) {
-        guard let commander = self.commander else { return }
         let fontSize = self.fontSize
         let minX = (fontSize * 5) + (marginX * 2)
         let width = bounds.width - minX - (marginX * 2) - clearSize
         guard width > 0 else { return }
         var text: String
-        switch self.category {
-        // 일반 조합키
-        case .normal: text = commander.key?.readable ?? ""
-        // 상하/좌우 전환키
-        case .swap: text = commander.swapKey?.readable ?? ""
-        // 대체 키
-        case .alternative: text = commander.alternativeKey?.readable ?? ""
+        if isRecording {
+            text = ""
+        } else {
+            guard let commander = self.commander else { return }
+            switch self.category {
+            case .normal: text = commander.key?.readable ?? ""
+            case .swap: text = commander.swapKey?.readable ?? ""
+            case .alternative: text = commander.alternativeKey?.readable ?? ""
+            }
         }
         text.draw(in: NSRect(x: minX, y: marginY, width: width, height: bounds.height), withAttributes: keyCodeTextAttributes())
     }

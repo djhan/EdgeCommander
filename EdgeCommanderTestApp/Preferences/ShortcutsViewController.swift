@@ -296,40 +296,40 @@ class ShortcutCellView: NSTableCellView {
         ])
     }
 }
-//
-//// MARK: - Preview
-//#if DEBUG
-//import SwiftUI
-//
-//private struct NSViewRepresenting<V: NSView>: NSViewRepresentable {
-//    let make: () -> V
-//    init(_ make: @escaping () -> V) { self.make = make }
-//    func makeNSView(context: Context) -> V { make() }
-//    func updateNSView(_ nsView: V, context: Context) {}
-//}
-//
-//#Preview("기본 상태") {
-//    NSViewRepresenting {
-//        let view = RecorderView(frame: NSRect(x: 0, y: 0, width: 300, height: 36))
-//        view.borderColor = .separatorColor
-//        view.borderWidth = 1
-//        view.cornerRadius = 6
-//        return view
-//    }
-//    .frame(width: 300, height: 36)
-//    .padding()
-//}
-//
-//#Preview("비활성화") {
-//    NSViewRepresenting {
-//        let view = RecorderView(frame: NSRect(x: 0, y: 0, width: 300, height: 36))
-//        view.borderColor = .separatorColor
-//        view.borderWidth = 1
-//        view.cornerRadius = 6
-//        view.isEnabled = false
-//        return view
-//    }
-//    .frame(width: 300, height: 36)
-//    .padding()
-//}
-//#endif
+
+// MARK: - Preview
+#if DEBUG
+import SwiftUI
+
+private struct NSViewRepresenting<V: NSView>: NSViewRepresentable {
+    let make: () -> V
+    init(_ make: @escaping () -> V) { self.make = make }
+    func makeNSView(context: Context) -> V { make() }
+    func updateNSView(_ nsView: V, context: Context) {}
+}
+
+#Preview("기본 상태") {
+    NSViewRepresenting {
+        let view = RecorderView(frame: NSRect(x: 0, y: 0, width: 300, height: 36))
+        view.borderColor = .separatorColor
+        view.borderWidth = 1
+        view.cornerRadius = 6
+        return view
+    }
+    .frame(width: 300, height: 36)
+    .padding()
+}
+
+#Preview("비활성화") {
+    NSViewRepresenting {
+        let view = RecorderView(frame: NSRect(x: 0, y: 0, width: 300, height: 36))
+        view.borderColor = .separatorColor
+        view.borderWidth = 1
+        view.cornerRadius = 6
+        view.isEnabled = false
+        return view
+    }
+    .frame(width: 300, height: 36)
+    .padding()
+}
+#endif

@@ -6,13 +6,13 @@
 import Cocoa
 import EdgeCommander
 
-@main
 class AppDelegate: NSObject, NSApplicationDelegate {
 
     var mainWindowController: MainWindowController?
     var preferencesWindowController: PreferencesWindowController?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        print("✅ applicationDidFinishLaunching called")
         // 1. 메뉴 구성
         setupMenus()
 
@@ -23,7 +23,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // 3. EdgeCommanderCoordinator 설정 (메뉴 구성 이후 실행)
         guard let mainMenu = NSApp.mainMenu else { return }
         CommanderCoordinator.shared.setup(for: mainMenu) { menuItem in
-            return Commander(menuItem)
+            let key = menuItem.keyEquivalent.isEmpty ? nil : menuItem.keyEquivalent
+            let modifiers = menuItem.keyEquivalent.isEmpty ? nil : menuItem.keyEquivalentModifierMask
+            return Commander(menuItem, key: key, modifierFlags: modifiers)
         }
     }
 
