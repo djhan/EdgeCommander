@@ -238,8 +238,9 @@ public class EdgeCommanderCoordinator {
     ///   - key: 검색할 키 값을 지정한다.
     ///   - modifierFlags: `NSEvent.ModifierFlags`로 정의된 보조 키 값을 지정한다.
     /// - Returns: 발견 시 해당 `Commander`를 반환하고, 미발견 시 널값을 반환한다.
-    public func find(menuKey key: String, menuModifiers modifierFlags: NSEvent.ModifierFlags) -> EdgeCommander? {
-        return self.rootCommander?.find(menuKey: key, modifierFlags: modifierFlags)
+    public func find(key: String,
+                     modifierFlags: NSEvent.ModifierFlags) -> EdgeCommander? {
+        return self.rootCommander?.find(key: key, modifierFlags: modifierFlags)
     }
     /// 특정 단축키 조합과 일치하는 하위 EdgeCommander 반환
     /// - Important:
@@ -247,16 +248,16 @@ public class EdgeCommanderCoordinator {
     ///   - 즉, 단축키 조합을 변경하려 할 때, 변경하려는 조합과 일치하는 EdgeCommander가 있는지 여부를 확인하는 용도로 사용한다.
     ///   - 현재는 Internal 메쏘드로 사용한다.
     /// - Parameters:
-    ///   - findKey: 키 값을 지정한다.
-    ///   - findModifiers: 보조 키를 `Commander.Modifier`의 셋으로 지정한다. 널값 지정이 가능하다.
-    ///   - findCommander: 비교하려는 `Commander`를 지정한다.
+    ///   - willChangeKey: 키 값을 지정한다.
+    ///   - willChangeModifiers: 보조 키를 `EdgeCommander.Modifier`의 셋으로 지정한다. 널값 지정이 가능하다.
+    ///   - willChangeCommander: 비교하려는 `EdgeCommander`를 지정한다.
     ///   - category: 비교하려는 카테고리(일반 키 / 전환 키 / 대체 키).
     /// - Returns: EdgeCommander 및 검색 결과 종류(일반 키 / 대체 키 구분)를 `FoundCommanderResult`로 반환한다. 없는 경우 널값을 반환한다.
-    func find(key findKey: String,
-              modifiers findModifiers: Set<EdgeCommander.Modifier>?,
-              of findCommander: EdgeCommander,
+    func find(key willChangeKey: String,
+              modifiers willChangeModifiers: Set<EdgeCommander.Modifier>?,
+              of willChangeCommander: EdgeCommander,
               _ category: EdgeCommander.Category) -> FoundCommander? {
-        return self.rootCommander?.find(key: findKey, modifiers: findModifiers, of: findCommander, category)
+        return self.rootCommander?.find(key: willChangeKey, modifiers: willChangeModifiers, of: willChangeCommander, category)
     }
 
     // MARK: - Encoder

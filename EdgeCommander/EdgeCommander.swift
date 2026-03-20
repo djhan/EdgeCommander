@@ -1408,15 +1408,15 @@ extension EdgeCommander: @MainActor Collection {
     ///   - key: 검색할 키 값을 지정한다.
     ///   - modifierFlags: `NSEvent.ModifierFlags`로 정의된 보조 키 값을 지정한다.
     /// - Returns: 발견 시 해당 `Commander`를 반환하고, 미발견 시 널값을 반환한다.
-    func find(menuKey key: String, modifierFlags: NSEvent.ModifierFlags?) -> EdgeCommander? {
-        return self.find(menuKey: key, modifiers: modifierFlags?.toModifiers())
+    func find(key: String, modifierFlags: NSEvent.ModifierFlags?) -> EdgeCommander? {
+        return self.find(key: key, modifiers: modifierFlags?.toModifiers())
     }
      /// 주어진 키 값 및 보조 키와 일치하는 EdgeCommander 반환 private 메쏘드
     /// - Parameters:
     ///   - key: 검색할 키 값을 지정한다.
     ///   - modifier: `EdgeCommander.Modifier` 셋으로 정의된 보조 키 값을 지정한다.
     /// - Returns: 발견 시 해당 `EdgeCommander`를 반환하고, 미발견 시 널값을 반환한다.
-    private func find(menuKey key: String, modifiers: Set<EdgeCommander.Modifier>?) -> EdgeCommander? {
+    private func find(key: String, modifiers: Set<EdgeCommander.Modifier>?) -> EdgeCommander? {
         // children 유무 확인
         guard let children = self.children else {
             // 없는 경우, 자기 자신과 비교해서 맞는 경우 반환
@@ -1441,7 +1441,7 @@ extension EdgeCommander: @MainActor Collection {
         }
         // 내부 children 순환
         for commander in children {
-            guard let commander = commander.find(menuKey: key, modifiers: modifiers) else {
+            guard let commander = commander.find(key: key, modifiers: modifiers) else {
                 continue
             }
             return commander

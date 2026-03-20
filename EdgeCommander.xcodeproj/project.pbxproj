@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		EED4B1132F68FA850099C659 /* EdgeCommander.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EED4B1072F68FA850099C659 /* EdgeCommander.framework */; };
-		EED4B1232F68FC7D0099C659 /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = EED4B1222F68FC7D0099C659 /* KeyboardShortcuts */; };
 		EED4B1262F68FF630099C659 /* EdgeCommonLib.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EED4B1252F68FF630099C659 /* EdgeCommonLib.framework */; };
 /* End PBXBuildFile section */
 
@@ -48,7 +47,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				EED4B1262F68FF630099C659 /* EdgeCommonLib.framework in Frameworks */,
-				EED4B1232F68FC7D0099C659 /* KeyboardShortcuts in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -129,7 +127,6 @@
 			);
 			name = EdgeCommander;
 			packageProductDependencies = (
-				EED4B1222F68FC7D0099C659 /* KeyboardShortcuts */,
 			);
 			productName = EdgeCommander;
 			productReference = EED4B1072F68FA850099C659 /* EdgeCommander.framework */;
@@ -186,7 +183,6 @@
 			mainGroup = EED4B0FD2F68FA850099C659;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				EED4B1212F68FC7D0099C659 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = EED4B1082F68FA850099C659 /* Products */;
@@ -513,25 +509,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
-/* Begin XCRemoteSwiftPackageReference section */
-		EED4B1212F68FC7D0099C659 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/sindresorhus/KeyboardShortcuts";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 2.4.0;
-			};
-		};
-/* End XCRemoteSwiftPackageReference section */
-
-/* Begin XCSwiftPackageProductDependency section */
-		EED4B1222F68FC7D0099C659 /* KeyboardShortcuts */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = EED4B1212F68FC7D0099C659 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */;
-			productName = KeyboardShortcuts;
-		};
-/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = EED4B0FE2F68FA850099C659 /* Project object */;
 }

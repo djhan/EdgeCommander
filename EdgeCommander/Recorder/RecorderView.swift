@@ -66,14 +66,17 @@ public class RecorderView: NSView {
             // 표시 가능시
             case true:
                 // 이미 표시중인지 확인
-                guard self.subviews.contains(self.clearButton) == false else { return }
-                self.addSubview(self.clearButton)
+                guard let clearButton,
+                      self.subviews.contains(clearButton) == false else {
+                    return
+                }
+                self.addSubview(clearButton)
                 
             // 표시 불가시
             case false:
-                self.clearButton.removeFromSuperview()
+                clearButton?.removeFromSuperview()
             }
-            self.clearButton.isHidden = !self.canClear
+            clearButton?.isHidden = !self.canClear
 
             // 리드로잉
             self.needsDisplay = true
@@ -91,7 +94,7 @@ public class RecorderView: NSView {
         }
     }
 
-    private let clearButton = ClearButton()
+    private var clearButton: NSButton?
     private let validModifierFlags: [NSEvent.ModifierFlags] = [.function, .shift, .control, .option, .command]
     private let validModifiersFlagsText: [NSString] = ["fn", "⇧", "⌃", "⌥", "⌘"]
     private var inputModifierFlags = NSEvent.ModifierFlags()
@@ -142,6 +145,14 @@ public class RecorderView: NSView {
         layer?.cornerRadius = cornerRadius
         
         // Clear Button
+        clearButton = NSButton()
+        guard let clearButton else {
+            return
+        }
+        let config = NSImage.SymbolConfiguration(pointSize: self.clearSize, weight: .bold)
+        clearButton.image = NSImage(systemSymbolName: "xmark.circle", accessibilityDescription: String(localized: "Clear"))?.withSymbolConfiguration(config)
+        clearButton.bezelStyle = .circular
+        clearButton.isBordered = false
         clearButton.target = self
         clearButton.action = #selector(RecorderView.clearAndEndRecording)
         addSubview(clearButton)
@@ -180,7 +191,6 @@ public class RecorderView: NSView {
         case .alternative:
             modifiers = self.commander?.alternativeModifierFlags ?? inputModifierFlags
         }
-        //let modifiers =  self.commander?.modifierFlags ?? inputModifierFlags
         for (i, text) in validModifiersFlagsText.enumerated() {
             let rect = NSRect(x: marginX + (fontSize * CGFloat(i)), y: marginY, width: fontSize, height: bounds.height)
             text.draw(in: rect, withAttributes: modifierTextAttributes(modifiers, checkModifier: validModifierFlags[i]))
@@ -209,11 +219,11 @@ public class RecorderView: NSView {
         let clearSize = self.clearSize
         let x = bounds.width - clearSize - marginX
         let y = (bounds.height - clearSize) / 2
-        clearButton.frame = NSRect(x: x, y: y, width: clearSize, height: clearSize)
+        clearButton?.frame = NSRect(x: x, y: y, width: clearSize, height: clearSize)
         switch clearButtonMode {
-        case .always: clearButton.isHidden = false
-        case .never: clearButton.isHidden = true
-        case .whenRecorded: clearButton.isHidden = (self.commander == nil)
+        case .always: clearButton?.isHidden = false
+        case .never: clearButton?.isHidden = true
+        case .whenRecorded: clearButton?.isHidden = (self.commander == nil)
         }
     }
 
@@ -311,7 +321,7 @@ public class RecorderView: NSView {
         // 전환키인 경우, modifiers를 현재 commander의 modifiers로 대체
         let findModifiers = self.category == .swap ? commander.modifiers : modifiers
         // 검색 결과
-        let findResult = EdgeCommanderCoordinator.shared.find(key: key, modifiers: findModifiers, of: commander, self.category)
+        let foundResult = EdgeCommanderCoordinator.shared.find(key: key, modifiers: findModifiers, of: commander, self.category)
         
         // 일반 단축키 입력시
         // 이동 키만 있는 경우 -> 일반적인 단축키로 변경되었는지 확인
@@ -325,14 +335,14 @@ public class RecorderView: NSView {
             // NSAlert 생성
             let alert = NSAlert()
             // 주 경고 메시지
-            alert.messageText = "Commander_Altenate_to_Normal_Title".localized
+            alert.messageText = String(localized: "Change to normal shortcut.")
             // 설명
-            alert.informativeText = "Commander_Altenate_to_Normal_Info".localized(with: [commander.title])
+            alert.informativeText = String(localized: "\(commander.title) is change to normal shortcut. Alternative key will be clear.")
 
             // 제 1버튼:
-            alert.addButton(withTitle: "OK_Button".localized)
+            alert.addButton(withTitle: String(localized: "OK"))
             // 제 2버튼: 마지막 페이지 이동
-            alert.addButton(withTitle: "Cancel_Button".localized)
+            alert.addButton(withTitle: String(localized: "Cancel"))
 
             let response = alert.runModal()
             
@@ -357,8 +367,8 @@ public class RecorderView: NSView {
                 
         // 단축키와 충돌하는 commander가 있는지 확인
         // 현재 변경하려는 commander와 동일한 경우는 무시
-        guard let existCategory = findResult?.resultCategory,
-            let existCommander = findResult?.commander,
+        guard let existCategory = foundResult?.category,
+            let existCommander = foundResult?.commander,
             existCommander != commander else {
             // 단축키와 충돌하는 commander 미발견시, 업데이트 실행후 결과 반환
             return updateCommander()
@@ -376,38 +386,38 @@ public class RecorderView: NSView {
         // 일반 단축키 입력
         case .normal:
             // 주 경고 메시지
-            alert.messageText = "Commander_Same_Shortcut_Title".localized
+            alert.messageText = String(localized: "Same shortcut is already exist.")
             // 설명
-            let shortcutReadable = Commander.shortcutReadable(modifiers: modifiers, key: key)
-            informativeText = "Commander_Same_Shortcut_Info".localized(with: [shortcutReadable, existCommander.title])
+            let shortcutReadable = EdgeCommander.shortcutReadable(modifiers: modifiers, key: key)
+            informativeText = String(localized: "\(shortcutReadable) is used for \(existCommander.title).\r")
             
         // 전환 키 입력
         case .swap:
             // 주 경고 메시지
-            alert.messageText = "Commander_Same_Swap_Title".localized
+            alert.messageText = String(localized: "Same swap key is already exist.")
             // 설명
-            let shortcutReadable = commander.modifiers != nil ? Commander.shortcutReadable(modifiers: commander.modifiers!, key: key) : key.readable
-            informativeText = "Commander_Same_Swap_Info".localized(with: [shortcutReadable, existCommander.title])
+            let shortcutReadable = commander.modifiers != nil ? EdgeCommander.shortcutReadable(modifiers: commander.modifiers!, key: key) : key.readable
+            informativeText = String(localized: "Swapped shortcut \(shortcutReadable) is used for \(existCommander.title).\r")
             
         // 대체 키 입력
         case .alternative:
             // 주 경고 메시지
-            alert.messageText = "Commander_Same_Alter_Title".localized
+            alert.messageText = String(localized: "Same alternative key is already exist.")
             // 설명
-            let shortcutReadable = commander.alternativeModifiers != nil ? Commander.shortcutReadable(modifiers: commander.alternativeModifiers!, key: key) : key.readable
-            informativeText = "Commander_Same_Alter_Info".localized(with: [shortcutReadable, existCommander.title])
+            let shortcutReadable = commander.alternativeModifiers != nil ? EdgeCommander.shortcutReadable(modifiers: commander.alternativeModifiers!, key: key) : key.readable
+            informativeText = String(localized: "Alternative shortcut \(shortcutReadable) is used for \(existCommander.title).\r)")
         }
         // 설명 텍스트 대입
-        alert.informativeText = informativeText + "Commander_Additional_Info".localized(with: [commander.title])
+        alert.informativeText = informativeText + String(localized: "Do you want to use this shortcut for \(commander.title)?")
         
         // 제 1버튼:
-        alert.addButton(withTitle: "OK_Button".localized)
+        alert.addButton(withTitle: String(localized: "OK"))
         // 제 2버튼: 마지막 페이지 이동
-        alert.addButton(withTitle: "Cancel_Button".localized)
+        alert.addButton(withTitle: String(localized: "Cancel"))
         // 제 1 버튼에 리턴 키 할당
-        alert.buttons[0].keyEquivalent = Commander.SpecialKey.return.rawValue
+        alert.buttons[0].keyEquivalent = EdgeCommander.SpecialKey.return.rawValue
         // 제 2 버튼(취소)에 Escape 키 할당
-        alert.buttons[1].keyEquivalent = Commander.SpecialKey.escape.rawValue
+        alert.buttons[1].keyEquivalent = EdgeCommander.SpecialKey.escape.rawValue
         
         // 경고음
         NSSound.beep()
@@ -460,8 +470,9 @@ public class RecorderView: NSView {
     }
 
     /// 이동 키만 입력된 경우인지 확인
-    /// - 이동 키만 입력된 경우 경고창 표시
-    private func checkIsOnlyMovementKey(_ commander: Commander) {
+    /// - 이동 키만 입력된 경우 경고창을 표시한다.
+    /// - Parameter commander: 단축 키를 확인하려는 `EdgeCommander`.
+    private func checkIsOnlyMovementKey(_ commander: EdgeCommander) {
         
         guard commander.isOnlyMovableKey == true else {
             return
@@ -471,13 +482,13 @@ public class RecorderView: NSView {
         let alert = NSAlert()
 
         // 제 1버튼:
-        alert.addButton(withTitle: "OK_Button".localized)
+        alert.addButton(withTitle: String(localized: "OK"))
         // 제 1 버튼에 리턴 키 할당
-        alert.buttons[0].keyEquivalent = Commander.SpecialKey.return.rawValue
+        alert.buttons[0].keyEquivalent = EdgeCommander.SpecialKey.return.rawValue
         // 주 경고 메시지
-        alert.messageText = "Commander_IsOnlyMovementKey_Title".localized
+        alert.messageText = String(localized: "Only Movement Key was set.")
         // 설명
-        alert.informativeText = "Commander_IsOnlyMovementKey_Info".localized(with: [commander.title])
+        alert.informativeText = String(localized: "Only movement key was set for \(commander.title). You can set alternative shortcut key, too.")
 
         alert.runModal()
     }
