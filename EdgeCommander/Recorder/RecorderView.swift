@@ -566,13 +566,12 @@ extension RecorderView {
         guard isEnabled else { return false }
         if let delegate = delegate, !delegate.recorderViewShouldBeginRecording(self) {
             NSSound.beep()
-            //print("RecoderView>focusView: 실패 처리")
+            EdgeLogger.shared.uiLogger.error("\(#file):\(#function) :: isEnabled == false")
             return false
         }
         isRecording = true
         needsDisplay = true
         updateTrackingAreas()
-        //print("RecoderView>focusView:")
         return true
     }
 
@@ -582,7 +581,6 @@ extension RecorderView {
         updateTrackingAreas()
         needsDisplay = true
         delegate?.recorderViewDidEndRecording(self)
-        //print("RecoderView>unfocusView:")
     }
 }
 
@@ -619,13 +617,6 @@ extension RecorderView {
     
     /// 단축키 제거
     @objc public func clear() {
-        /*
-        commander = nil
-        inputModifierFlags = NSEvent.ModifierFlags()
-        needsDisplay = true
-        didChange?(nil)
-        delegate?.recorderView(self, didChange: nil)*/
-        
         switch self.category {
         // 일반 단축키 입력시
         case .normal:
@@ -660,4 +651,3 @@ extension RecorderView {
         case whenRecorded
     }
 }
-
