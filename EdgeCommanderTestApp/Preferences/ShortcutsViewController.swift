@@ -309,7 +309,7 @@ private struct NSViewRepresenting<V: NSView>: NSViewRepresentable {
 
 #Preview("기본 상태") {
     NSViewRepresenting {
-        let view = RecorderView(frame: NSRect(x: 0, y: 0, width: 300, height: 36))
+        let view = RecorderView(frame: NSRect(x: 0, y: 0, width: 300, height: 48))
         view.borderWidth = 1
         view.cornerRadius = 6
         return view
@@ -320,13 +320,13 @@ private struct NSViewRepresenting<V: NSView>: NSViewRepresentable {
 
 #Preview("비활성화") {
     NSViewRepresenting {
-        let view = RecorderView(frame: NSRect(x: 0, y: 0, width: 300, height: 36))
+        let view = RecorderView(frame: NSRect(x: 0, y: 0, width: 300, height: 48))
         view.borderWidth = 1
         view.cornerRadius = 6
         view.isEnabled = false
         return view
     }
-    .frame(width: 300, height: 36)
+    .frame(width: 300, height: 48)
     .padding()
 }
 #endif

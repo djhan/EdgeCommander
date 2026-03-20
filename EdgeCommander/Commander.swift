@@ -220,6 +220,7 @@ public class Commander: Codable,
     // MARK: - Properties
     
     /// ID
+    /// - [ISSUE C] 디코딩이나 copy() 시 매번 새로운 UUID가 발급되므로 복제본과 원본을 `==` 로 직접 비교하는 것을 지양하십시오.
     public let id = UUID()
 
     /// 최상위 Root Commander 여부
@@ -470,8 +471,10 @@ public class Commander: Codable,
         // 하위 commander의 전환 키 사용이 가능하도록 세팅
         self.canSwap = true
         
-        // 하위 아이템을 재귀적으로 추가한다.
-        addChild(initializeHandler)
+        if let initializeHandler {
+            // 하위 아이템을 재귀적으로 추가한다.
+            addChild(initializeHandler)
+        }
     }
     /// 초기화
     /// - 서브 메뉴 아이템을 지정할 때 사용되며, 서브 메뉴를 지정해 초기화한다.
@@ -612,10 +615,10 @@ public class Commander: Codable,
     
     /// 하위 `Commander`를 재귀적으로 추가하는 메쏘드
     /// - Root Commander 에서 초기화 시 호출, initializeHandler 클로저를 통해 하위 아이템을 재귀적으로 추가한다.
-    /// - Parameter initializeHandler: 이 클로저에서 `NSMenuItem`으로 하위 Commander를 초기화한다. 널값 지정도 가능하다.
+    /// - Parameter initializeHandler: 이 클로저에서 `NSMenuItem`으로 하위 Commander를 초기화한다.
     /// - Returns: 하위 Commander 추가 성공 시 true를 반환, 실패 시에는 false를 반환한다.
     @discardableResult
-    func addChild(_ initializeHandler: ((_ menuItem: NSMenuItem) -> Commander?)?) -> Bool {
+    func addChild(_ initializeHandler: (_ menuItem: NSMenuItem) -> Commander?) -> Bool {
         // 하위 Commander 배열
         var children = [Commander]()
         
@@ -628,18 +631,6 @@ public class Commander: Codable,
             //--------------------------------------------------------------//
             /// 하위 Commander를 추가하는 내부 메소드
             func addChild() {
-                guard let initializeHandler else {
-                    // initializeHandler 가 없는 경우
-                    // menuItem으로 초기화 시도
-                    guard let commander = Commander(menuItem) else {
-                        EdgeLogger.shared.uiLogger.debug("\(#file):\(#function) :: \(menuItem.title) 로 하위 Commander를 생성할 수 없습니다.")
-                        // 다음 아이템으로 이동
-                        return
-                    }
-                    // 하위 commander 추가
-                    children.append(commander)
-                    return
-                }
                 // initializeHandler 로 commander 생성
                 guard let commander = initializeHandler(menuItem) else {
                     EdgeLogger.shared.uiLogger.debug("\(#file):\(#function) :: initializeHandler로 하위 Commander를 생성할 수 없습니다.")
@@ -1174,7 +1165,11 @@ extension Commander {
             guard let menu else {
                 fatalError("\(#file):\(#function) :: 루트 아이템의 메뉴가 널값입니다.")
             }
-            commander = Commander(mainMenu: menu)
+            // [ISSUE B FIXED] Commander(mainMenu: menu) 대신 수동 초기화하여 addChild() 중복 실행 방지
+            commander = Commander(Commander.Label.mainMenu.rawValue)
+            commander.isRoot = true
+            commander.menu = menu
+            commander.canSwap = true
         }
         else {
             // 서브메뉴 아이템인 경우
@@ -1646,8 +1641,9 @@ extension Commander {
     private func restoreSettings(from restoredCommander: Commander) -> Void {
         // parent인지 확인
         guard self.isParent == true else {
-            // 자기 자신이 commander인 경우
-            // 동일한 commander를 복원된 commander에서 검색
+            /// # 비교
+            /// - 자기 자신이 commander인 경우, 동일한 commander를 복원된 commander에서 검색햔다.
+            /// - id는 생성 시마다 초기화되기 때문에, 이 때는 actionDescription과 tag 값으로 동일 commander 여부를 확인해야 한다.
             guard let actionDescription = self.actionDescription else { return }
             guard let commander = restoredCommander.find(actionDescription: actionDescription, tag: self.tag) else { return }
             
@@ -1674,6 +1670,7 @@ extension Commander {
 extension Commander {
     
     /// 해쉬 값 생성
+    /// - [ISSUE C 주의] 복제된 객체나 디코딩된 객체는 고유 UUID가 변경되므로 Set/Dictionary 활용 시 기존 객체 요소와 매칭되지 않습니다.
     public func hash(into hasher: inout Hasher) {
         //hasher.combine(self.action)
         //hasher.combine(self.tag)
@@ -1681,6 +1678,8 @@ extension Commander {
     }
     
     /// 동등성 비교
+    /// - [ISSUE C 주의] 값이 동일하더라도 복제된 객체는 식별자(UUID)가 달라 false를 반환합니다.
+    /// - 값 기반으로 비교하려면 actionDescription과 tag 등의 속성을 통해 직접 탐색하십시오.
     public static func == (lhs: Commander, rhs: Commander) -> Bool {
         return lhs.id == rhs.id
     }
