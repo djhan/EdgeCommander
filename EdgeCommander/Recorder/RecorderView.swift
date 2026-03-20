@@ -30,15 +30,6 @@ public protocol RecorderViewDelegate: AnyObject {
 public class RecorderView: NSView {
 
     // MARK: - Properties
-    @IBInspectable open var backgroundColor: NSColor = .controlColor {
-        didSet { layer?.backgroundColor = backgroundColor.cgColor }
-    }
-    @IBInspectable open var tintColor: NSColor = .controlAccentColor {
-        didSet { needsDisplay = true }
-    }
-    @IBInspectable open var borderColor: NSColor = .controlColor {
-        didSet { layer?.borderColor = borderColor.cgColor }
-    }
     @IBInspectable open var borderWidth: CGFloat = 0 {
         didSet { layer?.borderWidth = borderWidth }
     }
@@ -49,7 +40,11 @@ public class RecorderView: NSView {
         }
     }
     public var clearButtonMode: RecorderView.ClearButtonMode = .always {
-        didSet { needsDisplay = true }
+        didSet {
+            updateClearButtonVisibility()
+            needsLayout = true
+            needsDisplay = true
+        }
     }
 
     public weak var delegate: RecorderViewDelegate?
@@ -66,17 +61,15 @@ public class RecorderView: NSView {
             // 표시 가능시
             case true:
                 // 이미 표시중인지 확인
-                guard let clearButton,
-                      self.subviews.contains(clearButton) == false else {
-                    return
+                if let clearButton, !self.subviews.contains(clearButton) {
+                    self.addSubview(clearButton)
                 }
-                self.addSubview(clearButton)
                 
             // 표시 불가시
             case false:
                 clearButton?.removeFromSuperview()
             }
-            clearButton?.isHidden = !self.canClear
+            updateClearButtonVisibility()
 
             // 리드로잉
             self.needsDisplay = true
@@ -93,7 +86,7 @@ public class RecorderView: NSView {
             noteFocusRingMaskChanged()
         }
     }
-
+    
     private var clearButton: NSButton?
     private let validModifierFlags: [NSEvent.ModifierFlags] = [.function, .shift, .control, .option, .command]
     private let validModifiersFlagsText: [NSString] = ["fn", "⇧", "⌃", "⌥", "⌘"]
@@ -139,8 +132,8 @@ public class RecorderView: NSView {
     private func initView() {
         // Layer
         wantsLayer = true
-        layer?.backgroundColor = backgroundColor.cgColor
-        layer?.borderColor = borderColor.cgColor
+        layer?.backgroundColor = NSColor.controlBackgroundColor.cgColor
+        layer?.borderColor = NSColor.controlColor.cgColor
         layer?.borderWidth = borderWidth
         layer?.cornerRadius = cornerRadius
         
@@ -150,13 +143,31 @@ public class RecorderView: NSView {
             return
         }
         let config = NSImage.SymbolConfiguration(pointSize: self.clearSize, weight: .bold)
+            .applying(.init(hierarchicalColor: .controlAccentColor))
         clearButton.image = NSImage(systemSymbolName: "xmark.circle", accessibilityDescription: String(localized: "Clear"))?.withSymbolConfiguration(config)
         clearButton.bezelStyle = .circular
-        clearButton.bezelColor = .controlAccentColor
+        clearButton.contentTintColor = .controlAccentColor
         clearButton.isBordered = false
         clearButton.target = self
         clearButton.action = #selector(RecorderView.clearAndEndRecording)
         addSubview(clearButton)
+    }
+
+    // MARK: - Layout
+    public override func layout() {
+        super.layout()
+        let clearSize = self.clearSize
+        let x = bounds.width - clearSize - marginX
+        let y = (bounds.height - clearSize) / 2
+        clearButton?.frame = NSRect(x: x, y: y, width: clearSize, height: clearSize)
+    }
+
+    private func updateClearButtonVisibility() {
+        switch clearButtonMode {
+        case .always: clearButton?.isHidden = false
+        case .never:  clearButton?.isHidden = true
+        case .whenRecorded: clearButton?.isHidden = !self.canClear
+        }
     }
 
     // MARK: - Draw
@@ -166,14 +177,13 @@ public class RecorderView: NSView {
     }
 
     public override func draw(_ dirtyRect: NSRect) {
-        layer?.backgroundColor = backgroundColor.cgColor
-        layer?.borderColor = borderColor.cgColor
+        layer?.backgroundColor = NSColor.controlBackgroundColor.cgColor
+        layer?.borderColor = NSColor.controlColor.cgColor
         // 일반 단축키 입력 / 대체 키 입력인 경우 modifier key 영역 드로잉
         if self.category == .normal || self.category == .alternative {
             drawModifiers(dirtyRect)
         }
         drawKeyCode(dirtyRect)
-        drawClearButton(dirtyRect)
     }
 
     private func drawModifiers(_ dirtyRect: NSRect) {
@@ -217,17 +227,7 @@ public class RecorderView: NSView {
         text.draw(in: NSRect(x: minX, y: marginY, width: width, height: bounds.height), withAttributes: keyCodeTextAttributes())
     }
 
-    private func drawClearButton(_ dirtyRext: NSRect) {
-        let clearSize = self.clearSize
-        let x = bounds.width - clearSize - marginX
-        let y = (bounds.height - clearSize) / 2
-        clearButton?.frame = NSRect(x: x, y: y, width: clearSize, height: clearSize)
-        switch clearButtonMode {
-        case .always: clearButton?.isHidden = false
-        case .never: clearButton?.isHidden = true
-        case .whenRecorded: clearButton?.isHidden = (self.commander == nil)
-        }
-    }
+    // removed drawClearButton
 
     // MARK: - NSResponder
     public override var acceptsFirstResponder: Bool {
@@ -312,6 +312,7 @@ public class RecorderView: NSView {
             
             didChange(commander)
             endRecording()
+            updateClearButtonVisibility()
             return true
         }
         //---------------------------------------------------------------------//
@@ -517,7 +518,7 @@ private extension RecorderView {
         if !isEnabled {
             textColor = .disabledControlTextColor
         } else if modifiers.contains(checkModifier) {
-            textColor = tintColor
+            textColor = .controlAccentColor
         } else {
             textColor = .lightGray
         }
@@ -534,7 +535,7 @@ private extension RecorderView {
         if !isEnabled {
             textColor = .disabledControlTextColor
         } else {
-            textColor = tintColor
+            textColor = .controlAccentColor
         }
         return [.font: NSFont.systemFont(ofSize: floor(fontSize)),
                 .foregroundColor: textColor,
@@ -630,6 +631,7 @@ extension RecorderView {
             self.commander?.alternativeModifiers = nil
         }
         needsDisplay = true
+        updateClearButtonVisibility()
         didChange?(self.commander)
         delegate?.recorderView(self, didChange: self.commander)
     }
