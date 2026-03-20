@@ -115,13 +115,13 @@ public class RecorderView: NSView {
     }
 
     // MARK: - Override Properties
-    open override var isOpaque: Bool {
+    public override var isOpaque: Bool {
         return false
     }
-    open override var isFlipped: Bool {
+    public override var isFlipped: Bool {
         return true
     }
-    open override var focusRingMaskBounds: NSRect {
+    public override var focusRingMaskBounds: NSRect {
         return (isFirstResponder) ? bounds : NSRect.zero
     }
 
@@ -152,6 +152,7 @@ public class RecorderView: NSView {
         let config = NSImage.SymbolConfiguration(pointSize: self.clearSize, weight: .bold)
         clearButton.image = NSImage(systemSymbolName: "xmark.circle", accessibilityDescription: String(localized: "Clear"))?.withSymbolConfiguration(config)
         clearButton.bezelStyle = .circular
+        clearButton.bezelColor = .controlAccentColor
         clearButton.isBordered = false
         clearButton.target = self
         clearButton.action = #selector(RecorderView.clearAndEndRecording)
@@ -159,12 +160,12 @@ public class RecorderView: NSView {
     }
 
     // MARK: - Draw
-    open override func drawFocusRingMask() {
+    public override func drawFocusRingMask() {
         guard isFirstResponder else { return }
         NSBezierPath(roundedRect: bounds, xRadius: cornerRadius, yRadius: cornerRadius).fill()
     }
 
-    open override func draw(_ dirtyRect: NSRect) {
+    public override func draw(_ dirtyRect: NSRect) {
         layer?.backgroundColor = backgroundColor.cgColor
         layer?.borderColor = borderColor.cgColor
         // 일반 단축키 입력 / 대체 키 입력인 경우 modifier key 영역 드로잉
@@ -229,42 +230,38 @@ public class RecorderView: NSView {
     }
 
     // MARK: - NSResponder
-    open override var acceptsFirstResponder: Bool {
+    public override var acceptsFirstResponder: Bool {
         return isEnabled
     }
 
-    open override var canBecomeKeyView: Bool {
+    public override var canBecomeKeyView: Bool {
         return super.canBecomeKeyView && NSApp.isFullKeyboardAccessEnabled
     }
 
-    open override var needsPanelToBecomeKey: Bool {
+    public override var needsPanelToBecomeKey: Bool {
         return true
     }
 
-    open override func becomeFirstResponder() -> Bool {
+    public override func becomeFirstResponder() -> Bool {
         return focusView()
     }
 
-    open override func resignFirstResponder() -> Bool {
+    public override func resignFirstResponder() -> Bool {
         unfocusView()
-        //print("RecoderView>resignFirstResponder:")
         return super.resignFirstResponder()
     }
 
-    open override func cancelOperation(_ sender: Any?) {
+    public override func cancelOperation(_ sender: Any?) {
         endRecording()
     }
 
-    open override func keyDown(with theEvent: NSEvent) {
+    public override func keyDown(with theEvent: NSEvent) {
         guard !performKeyEquivalent(with: theEvent) else { return }
         super.keyDown(with: theEvent)
     }
-
-    /**
-     키 입력
-     - NSEvent의 keycode 기반으로 키값을 생성. [참고 링크] (http://vak.ru/doku.php/proj/macosx/function-keys)
-     */
-    open override func performKeyEquivalent(with theEvent: NSEvent) -> Bool {
+    /// 키 입력
+    /// - [참고 링크](http://vak.ru/doku.php/proj/macosx/function-keys)에 따라, NSEvent의 keycode 기반으로 키값을 생성한다.
+    public override func performKeyEquivalent(with theEvent: NSEvent) -> Bool {
         guard isFirstResponder else { return false }
         guard let commander = self.commander else { return false }
         
@@ -495,7 +492,7 @@ public class RecorderView: NSView {
     }
     
     
-    open override func flagsChanged(with theEvent: NSEvent) {
+    public override func flagsChanged(with theEvent: NSEvent) {
         guard isFirstResponder else {
             inputModifierFlags = NSEvent.ModifierFlags()
             needsDisplay = true

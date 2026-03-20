@@ -6,13 +6,26 @@
 import Cocoa
 import EdgeCommander
 
+@main
 class AppDelegate: NSObject, NSApplicationDelegate {
+
+    static func main() {
+        let app = NSApplication.shared
+        let delegate = AppDelegate()
+        app.delegate = delegate
+        app.run()
+    }
 
     var mainWindowController: MainWindowController?
     var preferencesWindowController: PreferencesWindowController?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         print("✅ applicationDidFinishLaunching called")
+        
+        // 0. Activation Policy 설정 (프로그래매틱 UI용)
+        NSApp.setActivationPolicy(.regular)
+        NSApp.activate(ignoringOtherApps: true)
+
         // 1. 메뉴 구성
         setupMenus()
 
