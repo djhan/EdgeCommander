@@ -63,6 +63,13 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		EE11F0622F6A2D7500A67859 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		EED4B0FD2F68FA850099C659 = {
 			isa = PBXGroup;
 			children = (
@@ -184,6 +191,12 @@
 			preferredProjectObjectVersion = 77;
 			productRefGroup = EED4B1082F68FA850099C659 /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = EE11F0622F6A2D7500A67859 /* Products */;
+					ProjectRef = EED4B1292F68FF720099C659 /* EdgeCommonLib.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				EED4B1062F68FA850099C659 /* EdgeCommander */,
