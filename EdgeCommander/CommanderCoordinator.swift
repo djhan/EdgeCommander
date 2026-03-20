@@ -1,5 +1,5 @@
 //
-//  EdgeCommanderCoordinator.swift
+//  CommanderCoordinator.swift
 //  EdgeCommander
 //
 //  Created by DJ.HAN on 3/18/26.
@@ -10,40 +10,40 @@ import Cocoa
 
 import EdgeCommonLib
 
-// MARK: - EdgeCommander Coordinator Class -
+// MARK: - Commander Coordinator Class -
 @MainActor
-public class EdgeCommanderCoordinator {
+public class CommanderCoordinator {
     
     // MARK: - Static Properties
     /// 싱글톤 선언
-    public static let shared = EdgeCommanderCoordinator()
+    public static let shared = CommanderCoordinator()
 
     /// Root Commander
-    private var rootCommander: EdgeCommander?
+    private var rootCommander: Commander?
     /// Default Commander
     /// - 기본값으로 설정된 Root Commander 복사본으로, 기본값 복원 시 사용한다.
-    private var defaultCommander: EdgeCommander?
+    private var defaultCommander: Commander?
 
     // MARK: - Initializaiton
     /// 초기 셋업
     /// - Important:
     ///   - AppDelegate에서 앱 초기화 시 이 메쏘드를 실행한다.
-    ///   - 반드시`EdgeCommanderCoordinator.shared()` 호출 전에 반드시 이 초기 셋업을 실행해야 한다.
+    ///   - 반드시`CommanderCoordinator.shared()` 호출 전에 반드시 이 초기 셋업을 실행해야 한다.
     ///   - Root Commander를 복원하려면 환경설정에 저장되어 있던 데이터를 지정한다.
     ///
     /// - Parameters:
     ///   - mainMenu: 메인 메뉴를 지정한다.
-    ///   - initializeHandler: EdgeCommander를 초기화할 클로저를 지정한다.
+    ///   - initializeHandler: Commander를 초기화할 클로저를 지정한다.
     ///   - restoreData: 복원할 Root Commander의 데이터. 기본값은 널값이다.
     ///   - saveHandler: 환경설정에 데이터를 저장하는 클로저. 기본값은 널값이다.
     public func setup(for mainMenu: NSMenu,
-                      _ initializeHandler: @escaping (_ menuItem: NSMenuItem) -> EdgeCommander?,
+                      _ initializeHandler: @escaping (_ menuItem: NSMenuItem) -> Commander?,
                       restoreData: Data? = nil,
                       _ saveHandler: ((_ data: Data) -> Bool)? = nil) {
         // Root Commander 초기화.
-        rootCommander = EdgeCommander(mainMenu: mainMenu, initializeHandler)
+        rootCommander = Commander(mainMenu: mainMenu, initializeHandler)
         // 기본값 상태의 Root Commander를 Default Commander로 지정한다.
-        defaultCommander = rootCommander?.copy() as? EdgeCommander
+        defaultCommander = rootCommander?.copy() as? Commander
 
         // 설정 복원
         if let restoreData,
@@ -151,7 +151,7 @@ public class EdgeCommanderCoordinator {
         return rootCommander.setAlternativeAll(isAlternative)
     }
     /// 전체 메뉴아이템의 수평 대체 단축키 전환
-    /// - 모든 하위 EdgeCommander를 수평 대체 단축키로 전환한다. 단, 대체 키가 지정된 EdgeCommander만 가능하다.
+    /// - 모든 하위 Commander를 수평 대체 단축키로 전환한다. 단, 대체 키가 지정된 Commander만 가능하다.
     /// - Parameter isAlternative: true는 대체 단축키로, false는 원래 상태로 복귀한다.
     /// - Returns: 대체 단축키 적용 여부를 반환한다. 1개라도 전환된 경우엔 true를, 모두 적용에 실패하면 false를 반환한다.
     @discardableResult
@@ -163,7 +163,7 @@ public class EdgeCommanderCoordinator {
         return rootCommander.setAlternativeHorizontal(isAlternative)
     }
     /// 전체 메뉴아이템의 수직 대체 단축키 전환
-    /// - 모든 하위 EdgeCommander를 수직 대체 단축키로 전환한다. 단, 대체 키가 지정된 EdgeCommander만 가능하다.
+    /// - 모든 하위 Commander를 수직 대체 단축키로 전환한다. 단, 대체 키가 지정된 Commander만 가능하다.
     /// - Parameter isAlternative: true는 대체 단축키로, false는 원래 상태로 복귀한다.
     /// - Returns: 대체 단축키 적용 여부를 반환한다. 1개라도 전환된 경우엔 true를, 모두 적용에 실패하면 false를 반환한다.
     @discardableResult
@@ -204,32 +204,32 @@ public class EdgeCommanderCoordinator {
     // MARK: - Find Commander
     /// 특정 Menu의 하위 Commander 셋을 전부 반환
     /// - Parameter menu: 찾으려는 메뉴.
-    /// - Returns: EdgeCommander 셋을 반환한다. 해당 메뉴에 EdgeCommander가 없다면 널값이 반환된다.
-    public func find(in menu: NSMenu) -> Set<EdgeCommander>? {
+    /// - Returns: Commander 셋을 반환한다. 해당 메뉴에 Commander가 없다면 널값이 반환된다.
+    public func find(in menu: NSMenu) -> Set<Commander>? {
         return self.rootCommander?.find(in: menu)
     }
     /// 특정 `NSMenuItem`을 격납한 `Commander` 반환
     /// - Parameter menuItem: 찾으려는 메뉴아이템.
-    /// - Returns: 해당 메뉴아이템을 격납한 EdgeCommander을 반환한다. 없는 경우 널값을 반환한다.
-    public func find(menuItem: NSMenuItem) -> EdgeCommander? {
+    /// - Returns: 해당 메뉴아이템을 격납한 Commander을 반환한다. 없는 경우 널값을 반환한다.
+    public func find(menuItem: NSMenuItem) -> Commander? {
         return self.rootCommander?.find(menuItem: menuItem)
     }
     /// 특정 `Selector`를 가진 `Commander` 셋을 반환한다
     /// - Important: tag가 다른 `Commander`들이 있는 경우, 모두 찾아서 셋으로 묶어 반환한다.
     /// - Parameter action: 찾으려는 `Selector`를 지정한다.
     /// - Returns: 검색한 `Commander`를 셋으로 반환한다.
-    public func find(action: Selector) -> Set<EdgeCommander>? {
+    public func find(action: Selector) -> Set<Commander>? {
         return self.rootCommander?.find(action: action)
     }
-    /// 특정 action description 및 tag와 일치하는 EdgeCommander 반환 메쏘드
+    /// 특정 action description 및 tag와 일치하는 Commander 반환 메쏘드
     /// - Parameters:
     ///   - actionDescription: 검색할 action description 문자열.
     ///   - tag: 검색할 태그 값. 널값 지정 시 태그 검색은 생략한다.
     /// - Returns: 발견 시 해당 `Commander`를 반환하고, 미발견 시 널값을 반환한다.
-    public func find(actionDescription: String, tag: Int) -> EdgeCommander? {
+    public func find(actionDescription: String, tag: Int) -> Commander? {
         return self.rootCommander?.find(actionDescription: actionDescription, tag: tag)
     }
-    /// 주어진 키 값 및 보조 키와 일치하는 EdgeCommander 반환
+    /// 주어진 키 값 및 보조 키와 일치하는 Commander 반환
     /// - `NSEvent.ModifierFlags.intersection(.deviceIndependentFlagsMask) == 비교할 NSEvent.ModifierFlags` 라는 식으로 실행한다.
     /// - Important:
     ///   - [참고 링크](https://stackoverflow.com/questions/47255354/swift-4-bitwise-and-for-nsevent-modifierflags) 방식으로도 View에서 입력받은 ModifierFlags를 정확하게 파악할 수 없는 경우가 있다.
@@ -239,24 +239,24 @@ public class EdgeCommanderCoordinator {
     ///   - modifierFlags: `NSEvent.ModifierFlags`로 정의된 보조 키 값을 지정한다.
     /// - Returns: 발견 시 해당 `Commander`를 반환하고, 미발견 시 널값을 반환한다.
     public func find(key: String,
-                     modifierFlags: NSEvent.ModifierFlags) -> EdgeCommander? {
+                     modifierFlags: NSEvent.ModifierFlags) -> Commander? {
         return self.rootCommander?.find(key: key, modifierFlags: modifierFlags)
     }
-    /// 특정 단축키 조합과 일치하는 하위 EdgeCommander 반환
+    /// 특정 단축키 조합과 일치하는 하위 Commander 반환
     /// - Important:
-    ///   - findCommander가 다른 EdgeCommander 단축키와와 충돌하는지 여부를 탐색하는 것이 목적이다.
-    ///   - 즉, 단축키 조합을 변경하려 할 때, 변경하려는 조합과 일치하는 EdgeCommander가 있는지 여부를 확인하는 용도로 사용한다.
+    ///   - findCommander가 다른 Commander 단축키와와 충돌하는지 여부를 탐색하는 것이 목적이다.
+    ///   - 즉, 단축키 조합을 변경하려 할 때, 변경하려는 조합과 일치하는 Commander가 있는지 여부를 확인하는 용도로 사용한다.
     ///   - 현재는 Internal 메쏘드로 사용한다.
     /// - Parameters:
     ///   - willChangeKey: 키 값을 지정한다.
-    ///   - willChangeModifiers: 보조 키를 `EdgeCommander.Modifier`의 셋으로 지정한다. 널값 지정이 가능하다.
-    ///   - willChangeCommander: 비교하려는 `EdgeCommander`를 지정한다.
+    ///   - willChangeModifiers: 보조 키를 `Commander.Modifier`의 셋으로 지정한다. 널값 지정이 가능하다.
+    ///   - willChangeCommander: 비교하려는 `Commander`를 지정한다.
     ///   - category: 비교하려는 카테고리(일반 키 / 전환 키 / 대체 키).
-    /// - Returns: EdgeCommander 및 검색 결과 종류(일반 키 / 대체 키 구분)를 `FoundCommanderResult`로 반환한다. 없는 경우 널값을 반환한다.
+    /// - Returns: Commander 및 검색 결과 종류(일반 키 / 대체 키 구분)를 `FoundCommanderResult`로 반환한다. 없는 경우 널값을 반환한다.
     func find(key willChangeKey: String,
-              modifiers willChangeModifiers: Set<EdgeCommander.Modifier>?,
-              of willChangeCommander: EdgeCommander,
-              _ category: EdgeCommander.Category) -> FoundCommander? {
+              modifiers willChangeModifiers: Set<Commander.Modifier>?,
+              of willChangeCommander: Commander,
+              _ category: Commander.Category) -> FoundCommander? {
         return self.rootCommander?.find(key: willChangeKey, modifiers: willChangeModifiers, of: willChangeCommander, category)
     }
 
@@ -295,7 +295,7 @@ public class EdgeCommanderCoordinator {
         }
         
         let decoder = PropertyListDecoder()
-        guard let restoredRootCommander = try? decoder.decode(EdgeCommander.self, from: data) else {
+        guard let restoredRootCommander = try? decoder.decode(Commander.self, from: data) else {
             EdgeLogger.shared.uiLogger.error("\(#file):\(#function) :: Root Commander 복원에 실패했습니다.")
             // 복원할 Commander가 없는 경우, 현재 Root Commander를 저장한다
             save(saveHandler)
@@ -333,7 +333,7 @@ public class EdgeCommanderCoordinator {
 }
 
 // MARK: - Extension for Collection
-extension EdgeCommanderCoordinator: @MainActor Collection {
+extension CommanderCoordinator: @MainActor Collection {
     
     /// Children 갯수 반환
     public var count: Int {
@@ -349,7 +349,7 @@ extension EdgeCommanderCoordinator: @MainActor Collection {
     public var endIndex: Int {
         return self.count
     }
-    public subscript(index: Int) -> EdgeCommander? {
+    public subscript(index: Int) -> Commander? {
         guard 0 ..< endIndex ~= index else {
             return nil
         }

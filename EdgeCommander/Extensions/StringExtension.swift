@@ -19,7 +19,7 @@ public extension String {
     }
     /// 단축키 전환 방향
     /// - 현재 스트링의 유니코드 값이 `EdgeCommander.Special` 키인 경우, 전환 방향을 반환한다. 일반 키라면 널값을 반환한다.
-    var axis: EdgeCommander.Axis? {
+    var axis: Commander.Axis? {
         guard let specialKey = self.specialKey else {
             return nil
         }
@@ -32,15 +32,15 @@ public extension String {
             return .vertical
             // 그 외 - 선택용 키
         default:
-            return EdgeCommander.Axis.none
+            return Commander.Axis.none
         }
     }
     
-    /// `EdgeCommander.Special` 값을 반환
+    /// `Commander.Special` 값을 반환
     /// - Returns: 현재 스트링의 유니코드 값이 백스페이스, 탭, 리턴, 이스케이프, 상하좌우, 삭제, 홈, 엔드, 페이지업, 페이지다운 키인 경우, Commander.SpecialKey 값을 반환한다.
     /// 일반 키라면 널값을 반환한다.
-    var specialKey: EdgeCommander.SpecialKey? {
-        let filtered = EdgeCommander.SpecialKey.allCases.filter {
+    var specialKey: Commander.SpecialKey? {
+        let filtered = Commander.SpecialKey.allCases.filter {
             if $0.rawValue == self {
                 return true
             }

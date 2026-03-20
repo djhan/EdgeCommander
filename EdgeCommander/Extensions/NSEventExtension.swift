@@ -54,13 +54,13 @@ public extension NSEvent.ModifierFlags {
     ///   - 단일 키 입력시 `fn` + `numericPad` 키 조합이 같이 넘어오지만, `fn` 키만 누른 경우는 `numericPad`가 포함되지 않는다.
     ///   따라서 `fn` + `numericPad` 키가 입력되어 단일 키 입력으로 간주되는 경우에는 보조 키 플래그를 추가하지 않고 넘긴다.
     ///   - 일반적으로 뷰를 비롯한 각종 컨트롤에서 `override func performKeyEquivalent(with event: NSEvent) -> Bool` 메쏘드에서 `fn` + `numericPad` 키 조합은 false 로 반환하도록 한다.
-    func toModifiers() -> Set<EdgeCommander.Modifier>? {
+    func toModifiers() -> Set<Commander.Modifier>? {
         
-        var modifiers: Set<EdgeCommander.Modifier>?
+        var modifiers: Set<Commander.Modifier>?
         
         /// modifier 추가
-        func addModifier(_ modifier: EdgeCommander.Modifier) {
-            if modifiers == nil { modifiers = Set<EdgeCommander.Modifier>() }
+        func addModifier(_ modifier: Commander.Modifier) {
+            if modifiers == nil { modifiers = Set<Commander.Modifier>() }
             modifiers?.insert(modifier)
         }
         

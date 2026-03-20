@@ -1,5 +1,5 @@
 //
-//  EdgeCommander.swift
+//  Commander.swift
 //  EdgeCommander
 //
 //  Created by DJ.HAN on 3/17/26.
@@ -12,16 +12,16 @@ import EdgeCommonLib
 
 // MARK: - Typealias -
 
-/// EdgeCommander 검색 결과
+/// Commander 검색 결과
 /// - Parameters:
-///   - commander: EdgeCommander
-///   - category: EdgeCommander.Category 열거형. normal 과 swap 중 양자택일
-typealias FoundCommander = (commander: EdgeCommander, category: EdgeCommander.Category)
+///   - commander: Commander
+///   - category: Commander.Category 열거형. normal 과 swap 중 양자택일
+typealias FoundCommander = (commander: Commander, category: Commander.Category)
 
 
-// MARK: - EdgeCommander Class -
+// MARK: - Commander Class -
 
-/// EdgeCommander Class
+/// Commander Class
 /// - NSMenuItem의 단축키를 능동적으로 관리하는 객체.
 /// - 내부적으로 3 종류의 단축키를 격납할 수 있다.
 ///   1. 기본 단축키: 일반적인 단축키.
@@ -29,7 +29,7 @@ typealias FoundCommander = (commander: EdgeCommander, category: EdgeCommander.Ca
 ///   3. 대체 단축키: 특수한 상황에서 사용되는 단축키로, 보조 키만 대체하여 사용한다.
 /// - Important: 메인 쓰레드에서 실행하기 위해 @MainActor 매크로를 추가한다.
 @MainActor
-public class EdgeCommander: Codable,
+public class Commander: Codable,
                             NSCopying,
                             Identifiable,
                             Hashable {
@@ -40,7 +40,7 @@ public class EdgeCommander: Codable,
     ///   - modifiers: `Commander.Modifier`로 보조 키 셋을 지정한다. 널값을 지정할 수 있다.
     ///   - key: 키 값을 지정한다. 널값을 지정할 수 있다.
     /// - Returns: 메뉴아이템에 표시될 단축키 스트링을 반환한다. 보조 키/ 키 값이 주어지지 않으면 빈 문자열을 반환한다.
-    static internal func shortcutReadable(modifiers: Set<EdgeCommander.Modifier>?, key: String?) -> String {
+    static internal func shortcutReadable(modifiers: Set<Commander.Modifier>?, key: String?) -> String {
         // key 값이 주어졌는지 확인
         // Modifiers는 없을 수도 있다
         guard let key = key else {
@@ -52,8 +52,8 @@ public class EdgeCommander: Codable,
             
             // set 특성상 편집 키 순서가 제멋대로 표시될 수 있기 때문에 편집 키를 순서대로 표시할 수 있도록 한다
             
-            /// 특정 EdgeCommander 보조 키의 읽기 가능한 문자열을 추가하는 내부 메쏘드
-            func addModifier(_ modifier: EdgeCommander.Modifier) {
+            /// 특정 Commander 보조 키의 읽기 가능한 문자열을 추가하는 내부 메쏘드
+            func addModifier(_ modifier: Commander.Modifier) {
                 shortcutReadable.append(modifier.rawValue)
             }
             
@@ -222,16 +222,16 @@ public class EdgeCommander: Codable,
     /// ID
     public let id = UUID()
 
-    /// 최상위 Root EdgeCommander 여부
+    /// 최상위 Root Commander 여부
     var isRoot: Bool = false
-    /// 하위 EdgeCommander 아이템 배열
-    var children: [EdgeCommander]?
+    /// 하위 Commander 아이템 배열
+    public var children: [Commander]?
     /// leaf 노드 여부
-    var isLeaf: Bool {
+    public var isLeaf: Bool {
         return !isParent
     }
     /// Parent 메뉴아이템 여부
-    var isParent: Bool {
+    public var isParent: Bool {
         return menu != nil || children != nil
     }
     
@@ -251,14 +251,14 @@ public class EdgeCommander: Codable,
     }
     
     /// 전환 방향
-    private var swapAxis: EdgeCommander.Axis = .none
+    private var swapAxis: Commander.Axis = .none
     
     /// 메인 메뉴
-    /// - Root EdgeCommander/SubMenu EdgeCommander 전용 메뉴
+    /// - Root Commander/SubMenu Commander 전용 메뉴
     private weak var menu: NSMenu?
     
     /// 메뉴명 프로퍼티
-    var title: String {
+    public var title: String {
         didSet {
             if self.menuItem?.title != self.title {
                 self.menuItem?.title = self.title
@@ -285,7 +285,7 @@ public class EdgeCommander: Codable,
         }
     }
     /// 입력 키 값
-    var key: String? {
+    public var key: String? {
         didSet {
             // 기존 값과 동일한지 확인
             guard oldValue != self.key else {
@@ -296,7 +296,7 @@ public class EdgeCommander: Codable,
         }
     }
     /// 방향 전환 단축키
-    var swapKey: String? {
+    public var swapKey: String? {
         didSet {
             // 기존 값과 동일한지 확인
             guard oldValue != self.swapKey else {
@@ -314,11 +314,11 @@ public class EdgeCommander: Codable,
         }
     }
     /// 방향 전환 시 메뉴명
-    var swapTitle: String?
+    public var swapTitle: String?
     
     /// 보조 키 셋 프로퍼티
     /// - Command, Option, Control 등 보조 키 값을 격납하는 셋.
-    var modifiers: Set<Modifier>? {
+    public var modifiers: Set<Modifier>? {
         didSet {
             // 기존 값과 동일한지 확인
             guard oldValue != self.modifiers else {
@@ -330,29 +330,29 @@ public class EdgeCommander: Codable,
     }
     /// 현재 지정된 보조 키의 `NSEvent.ModifierFlags` 프로퍼티
     var modifierFlags: NSEvent.ModifierFlags {
-        return EdgeCommander.convert(modifiers: self.modifiers)
+        return Commander.convert(modifiers: self.modifiers)
     }
-    /// 현재 메뉴아이템에 적용된 편집 키 셋
-    /// - Command, Option, Control 등 편집 키 값
+    /// 현재 메뉴아이템에 적용된 보조 키 셋
+    /// - Command, Option, Control 등 보조 키 값
     private var currentModifiers: Set<Modifier>? { self.menuItem?.keyEquivalentModifierMask.toModifiers() }
     
     /// 단축키 표시 전용 스트링
     /// - 편집 키 셋과 입력 키 값을 조합해 구성된 프로퍼티.
-    var shortcutReadable: String?
+    public var shortcutReadable: String?
     
     /// 이동용 키 포함 여부
     /// - 화살표, page up/down, home, end 등 이동용 키를 포함했는지 여부를 판정하는 프로퍼티.
     var hasMovableKey: Bool {
         guard let key = self.key else { return false }
         switch key.readable {
-        case EdgeCommander.SpecialKey.up.readable,
-            EdgeCommander.SpecialKey.down.readable,
-            EdgeCommander.SpecialKey.left.readable,
-            EdgeCommander.SpecialKey.right.readable,
-            EdgeCommander.SpecialKey.pageUp.readable,
-            EdgeCommander.SpecialKey.pageDown.readable,
-            EdgeCommander.SpecialKey.home.readable,
-            EdgeCommander.SpecialKey.end.readable:
+        case Commander.SpecialKey.up.readable,
+            Commander.SpecialKey.down.readable,
+            Commander.SpecialKey.left.readable,
+            Commander.SpecialKey.right.readable,
+            Commander.SpecialKey.pageUp.readable,
+            Commander.SpecialKey.pageDown.readable,
+            Commander.SpecialKey.home.readable,
+            Commander.SpecialKey.end.readable:
             return true
         default:
             return false
@@ -371,7 +371,7 @@ public class EdgeCommander: Codable,
     /// 대체 단축키 사용 가능 여부
     /// - 특수 키(SpecialKey) 단독 사용 시에 true를 반환한다.
     var canAlternative: Bool {
-        // 최상위 Root EdgeCommander는 하위 EdgeCommander 변경이 가능하도록 true 를 반환한다.
+        // 최상위 Root Commander는 하위 Commander 변경이 가능하도록 true 를 반환한다.
         if self.isRoot == true { return true }
         // 하위 chidren이 있는 경우도 true 를 반환한다.
         if let children = self.children, children.count > 0 { return true }
@@ -396,14 +396,14 @@ public class EdgeCommander: Codable,
     }
     /// 대체 전환 방향
     /// - 전환 반향이 `Commander.Axis` 값으로 반환되며, 대체 전환 방향을 적용할 수 경우에는 널값이 반환된다.
-    var alternativeAxis: EdgeCommander.Axis? {
+    var alternativeAxis: Commander.Axis? {
         return self.alternativeKey?.axis
     }
     
     /// 대체 단축키 메뉴명
-    var alternativeTitle: String?
+    public var alternativeTitle: String?
     /// 대체 키
-    var alternativeKey: String? {
+    public var alternativeKey: String? {
         didSet {
             // 기존 값과 동일한지 확인
             guard oldValue != self.alternativeKey else { return }
@@ -411,7 +411,7 @@ public class EdgeCommander: Codable,
         }
     }
     /// 대체 보조 키
-    var alternativeModifiers: Set<Modifier>? {
+    public var alternativeModifiers: Set<Modifier>? {
         didSet {
             // 기존 값과 동일한지 확인
             guard oldValue != self.alternativeModifiers else { return }
@@ -434,7 +434,7 @@ public class EdgeCommander: Codable,
     
     /// 대체 편집 키 셋을 NSEvent ModifierFlags 로 반환
     var alternativeModifierFlags: NSEvent.ModifierFlags {
-        return EdgeCommander.convert(modifiers: self.alternativeModifiers)
+        return Commander.convert(modifiers: self.alternativeModifiers)
     }
     /// 대체 단축키 스트링
     /// - 출력용으로 편집 키 셋과 입력 키 값을 조합해 구성
@@ -458,13 +458,13 @@ public class EdgeCommander: Codable,
         self.tag = tag
     }
     /// 초기화
-    /// - Root EdgeCommander 초기화에 사용되며, 메인 메뉴를 지정해 초기화한다.
+    /// - Root Commander 초기화에 사용되며, 메인 메뉴를 지정해 초기화한다.
     /// - Parameters:
     ///   - mainMenu: `NSMenu` 를 지정한다.
     ///   - initializeHandler: 이 클로저에서 `NSMenuItem`으로 하위 Commander를 초기화한다. 널값 지정도 가능하며 기본값은 널값이다.
     public convenience init(mainMenu: NSMenu,
-                            _ initializeHandler: ((_ menuItem: NSMenuItem) -> EdgeCommander?)? = nil) {
-        self.init(EdgeCommander.Label.mainMenu.rawValue)
+                            _ initializeHandler: ((_ menuItem: NSMenuItem) -> Commander?)? = nil) {
+        self.init(Commander.Label.mainMenu.rawValue)
         self.isRoot = true
         self.menu = mainMenu
         // 하위 commander의 전환 키 사용이 가능하도록 세팅
@@ -504,7 +504,7 @@ public class EdgeCommander: Codable,
                              key: String? = nil,
                              modifierFlags: NSEvent.ModifierFlags? = nil,
                              canSwap: Bool = false,
-                             swapAxis: EdgeCommander.Axis = .none,
+                             swapAxis: Commander.Axis = .none,
                              swapTitle: String? = nil,
                              swapKeyEquivalent: String? = nil,
                              alternativeTitle: String? = nil,
@@ -554,8 +554,8 @@ public class EdgeCommander: Codable,
         self.title = try values.decode(String.self, forKey: .title)
         self.isRoot = try values.decode(Bool.self, forKey: .isRoot)
         self.canSwap = try values.decode(Bool.self, forKey: .canSwap)
-        self.swapAxis = try values.decode(EdgeCommander.Axis.self, forKey: .swapDirection)
-        if let children = try? values.decode([EdgeCommander].self, forKey: .children) {
+        self.swapAxis = try values.decode(Commander.Axis.self, forKey: .swapDirection)
+        if let children = try? values.decode([Commander].self, forKey: .children) {
             self.children = children
         }
         if let actionDescription = try? values.decode(String.self, forKey: .action) {
@@ -567,7 +567,7 @@ public class EdgeCommander: Codable,
         if let key = try? values.decode(String.self, forKey: .key) {
             self.key = key
         }
-        if let modifiers = try? values.decode(Set<EdgeCommander.Modifier>.self, forKey: .modifiers) {
+        if let modifiers = try? values.decode(Set<Commander.Modifier>.self, forKey: .modifiers) {
             self.modifiers = modifiers
         }
         if let swapTitle = try? values.decode(String.self, forKey: .swapTitle) {
@@ -582,7 +582,7 @@ public class EdgeCommander: Codable,
         if let alternativeKey = try? values.decode(String.self, forKey: .alterKey) {
             self.alternativeKey = alternativeKey
         }
-        if let alternativeModifiers = try? values.decode(Set<EdgeCommander.Modifier>.self, forKey: .alterModifiers) {
+        if let alternativeModifiers = try? values.decode(Set<Commander.Modifier>.self, forKey: .alterModifiers) {
             self.alternativeModifiers = alternativeModifiers
         }
     }
@@ -605,7 +605,7 @@ public class EdgeCommander: Codable,
         guard key.count > 0 else { return }
         let char = key[key.startIndex]
         if char.isUppercase == true {
-            if self.modifiers == nil { self.modifiers = Set<EdgeCommander.Modifier>() }
+            if self.modifiers == nil { self.modifiers = Set<Commander.Modifier>() }
             self.modifiers?.insert(.shift)
         }
     }
@@ -613,26 +613,26 @@ public class EdgeCommander: Codable,
     /// 하위 `Commander`를 재귀적으로 추가하는 메쏘드
     /// - Root Commander 에서 초기화 시 호출, initializeHandler 클로저를 통해 하위 아이템을 재귀적으로 추가한다.
     /// - Parameter initializeHandler: 이 클로저에서 `NSMenuItem`으로 하위 Commander를 초기화한다. 널값 지정도 가능하다.
-    /// - Returns: 하위 EdgeCommander 추가 성공 시 true를 반환, 실패 시에는 false를 반환한다.
+    /// - Returns: 하위 Commander 추가 성공 시 true를 반환, 실패 시에는 false를 반환한다.
     @discardableResult
-    func addChild(_ initializeHandler: ((_ menuItem: NSMenuItem) -> EdgeCommander?)?) -> Bool {
-        // 하위 EdgeCommander 배열
-        var children = [EdgeCommander]()
+    func addChild(_ initializeHandler: ((_ menuItem: NSMenuItem) -> Commander?)?) -> Bool {
+        // 하위 Commander 배열
+        var children = [Commander]()
         
         guard let menu = self.menu else {
-            EdgeLogger.shared.uiLogger.debug("\(#file):\(#function) :: 하위 EdgeCommander를 추가할 수 없습니다. 메뉴가 없습니다.")
+            EdgeLogger.shared.uiLogger.debug("\(#file):\(#function) :: 하위 Commander를 추가할 수 없습니다. 메뉴가 없습니다.")
             return false
         }
         
         for menuItem in menu.items {
             //--------------------------------------------------------------//
-            /// 하위 EdgeCommander를 추가하는 내부 메소드
+            /// 하위 Commander를 추가하는 내부 메소드
             func addChild() {
                 guard let initializeHandler else {
                     // initializeHandler 가 없는 경우
                     // menuItem으로 초기화 시도
-                    guard let commander = EdgeCommander(menuItem) else {
-                        EdgeLogger.shared.uiLogger.debug("\(#file):\(#function) :: \(menuItem.title) 로 하위 EdgeCommander를 생성할 수 없습니다.")
+                    guard let commander = Commander(menuItem) else {
+                        EdgeLogger.shared.uiLogger.debug("\(#file):\(#function) :: \(menuItem.title) 로 하위 Commander를 생성할 수 없습니다.")
                         // 다음 아이템으로 이동
                         return
                     }
@@ -642,7 +642,7 @@ public class EdgeCommander: Codable,
                 }
                 // initializeHandler 로 commander 생성
                 guard let commander = initializeHandler(menuItem) else {
-                    EdgeLogger.shared.uiLogger.debug("\(#file):\(#function) :: initializeHandler로 하위 EdgeCommander를 생성할 수 없습니다.")
+                    EdgeLogger.shared.uiLogger.debug("\(#file):\(#function) :: initializeHandler로 하위 Commander를 생성할 수 없습니다.")
                     // 다음 아이템으로 이동
                     return
                 }
@@ -660,7 +660,7 @@ public class EdgeCommander: Codable,
             
             // SubMenu 아이템인 경우
             // 하위 아이템 생성
-            let commander = EdgeCommander(menuItem.title, subMenu: subMenu)
+            let commander = Commander(menuItem.title, subMenu: subMenu)
             guard commander.addChild(initializeHandler) == true else {
                 // 하위 아이템이 0인 경우, 추가 없이 건너뛴다
                 continue
@@ -677,7 +677,7 @@ public class EdgeCommander: Codable,
         // 하위 commander 가 추가된 경우
         // children 프로퍼티에 추가
         if self.children == nil {
-            self.children = [EdgeCommander]()
+            self.children = [Commander]()
         }
         self.children?.append(contentsOf: children)
         // true 반환
@@ -687,7 +687,7 @@ public class EdgeCommander: Codable,
     // MARK: - Methods
     
     /// 메뉴아이템 단축키 및 단축키 스트링 업데이트
-    /// - Root EdgeCommander에서 최초로 사용되며, 모든 하위 EdgeCommander를 업데이트한다.
+    /// - Root Commander에서 최초로 사용되며, 모든 하위 Commander를 업데이트한다.
     func updateShortcuts() {
         guard let children = self.children else {
             return self.updateShortcut()
@@ -832,22 +832,22 @@ public class EdgeCommander: Codable,
     /// # RootCommander 전용 메쏘드
     
     /// 전체 좌우 전환
-    /// - 모든 하위 EdgeCommander 방향을 전환한다. 단, 방향 전환 단축키가 지정된 EdgeCommander만 가능하다.
+    /// - 모든 하위 Commander 방향을 전환한다. 단, 방향 전환 단축키가 지정된 Commander만 가능하다.
     /// - Parameter isSwap: 전환 여부를 지정한다.
     /// - Returns: 전환 단축키 적용 여부를 반환한다. 전환 단축키가 없거나 적용에 실패하면 false를 반환한다.
     @discardableResult
     func swapHorizontalAll(_ isSwap: Bool) -> Bool {
-        // Root EdgeCommander 여부 확인
+        // Root Commander 여부 확인
         guard isRoot else { return false }
         return self.setSwap(isSwap, swapAxis: .horizontal, includeChildren: true)
     }
     /// 전체 상하 전환
-    /// - 모든 하위 EdgeCommander 방향을 전환한다. 단, 방향 전환 단축키가 지정된 EdgeCommander만 가능하다.
+    /// - 모든 하위 Commander 방향을 전환한다. 단, 방향 전환 단축키가 지정된 Commander만 가능하다.
     /// - Parameter isSwap: 전환 여부를 지정한다.
     /// - Returns: 전환 단축키 적용 여부를 반환한다. 전환 단축키가 없거나 적용에 실패하면 false를 반환한다.
     @discardableResult
     func swapVerticalAll(_ isSwap: Bool) -> Bool {
-        // Root EdgeCommander 여부 확인
+        // Root Commander 여부 확인
         guard isRoot else { return false }
         return self.setSwap(isSwap, swapAxis: .vertical, includeChildren: true)
     }
@@ -858,7 +858,7 @@ public class EdgeCommander: Codable,
     /// - Returns: 전환 단축키 적용 여부를 반환한다. 1개라도 전환된 경우엔 true를, 모두 적용에 실패하면 false를 반환한다.
     @discardableResult
     func swapHorizontal(at menuItems: Set<NSMenuItem>, _ isSwap: Bool) -> Bool {
-        // Root EdgeCommander 여부 확인
+        // Root Commander 여부 확인
         guard isRoot else { return false }
         var success = false
         for menuItem in menuItems {
@@ -897,7 +897,7 @@ public class EdgeCommander: Codable,
     /// - Returns: 전환 단축키 적용 여부를 반환한다. 1개라도 전환된 경우엔 true를, 모두 적용에 실패하면 false를 반환한다.
     @discardableResult
     func swapHorizontal(of actions: Set<Selector>, _ isSwap: Bool) -> Bool {
-        // Root EdgeCommander 여부 확인
+        // Root Commander 여부 확인
         guard isRoot else { return false }
         var success = false
         for action in actions {
@@ -918,7 +918,7 @@ public class EdgeCommander: Codable,
     /// - Returns: 전환 단축키 적용 여부를 반환한다. 1개라도 전환된 경우엔 true를, 모두 적용에 실패하면 false를 반환한다.
     @discardableResult
     func swapVertical(of actions: Set<Selector>, _ isSwap: Bool) -> Bool {
-        // Root EdgeCommander 여부 확인
+        // Root Commander 여부 확인
         guard isRoot else { return false }
         var success = false
         for action in actions {
@@ -939,7 +939,7 @@ public class EdgeCommander: Codable,
     ///   - includeChildren: 하위 아이템까지 적용할지 여부를 지정한다.
     /// - Returns: 전환 단축키 적용 여부를 반환한다. 1개라도 전환된 경우엔 true를, 모두 적용에 실패하면 false를 반환한다.
     @discardableResult
-    private func setSwap(_ isSwap: Bool, swapAxis: EdgeCommander.Axis, includeChildren: Bool) -> Bool {
+    private func setSwap(_ isSwap: Bool, swapAxis: Commander.Axis, includeChildren: Bool) -> Bool {
         // canSwap이 false인 경우 중지
         guard self.canSwap == true else {
             return false
@@ -974,7 +974,7 @@ public class EdgeCommander: Codable,
         
         // children 포함 전환시
         if includeChildren == true {
-            // 하위 EdgeCommander 존재 여부 확인
+            // 하위 Commander 존재 여부 확인
             guard let children = self.children else { return success }
             for commander in children {
                 if commander.setSwap(isSwap, swapAxis: swapAxis, includeChildren: true) == true {
@@ -992,27 +992,27 @@ public class EdgeCommander: Codable,
     /// # RootCommander 전용 메쏘드
 
     /// 전체 대체 단축키 전환
-    /// - 모든 하위 EdgeCommander를 대체 단축키로 전환한다. 단, 대체 키가 지정된 EdgeCommander만 가능하다.
+    /// - 모든 하위 Commander를 대체 단축키로 전환한다. 단, 대체 키가 지정된 Commander만 가능하다.
     /// - Parameter isAlternative: 대체 단축키 사용 여부를 지정한다.
     /// - Returns: 대체 단축키 적용 여부를 반환한다. 1개라도 전환된 경우엔 true를, 모두 적용에 실패하면 false를 반환한다.
     @discardableResult
     func setAlternativeAll(_ isAlternative: Bool) -> Bool {
-        // Root EdgeCommander 여부 확인
+        // Root Commander 여부 확인
         guard isRoot else { return false }
         return self.setAlternative(isAlternative, alterAxis: nil, includeChildren: true)
     }
     /// 수평 대체 단축키 전환
-    /// - 모든 하위 EdgeCommander를 수평 대체 단축키로 전환한다. 단, 대체 키가 지정된 EdgeCommander만 가능하다.
+    /// - 모든 하위 Commander를 수평 대체 단축키로 전환한다. 단, 대체 키가 지정된 Commander만 가능하다.
     /// - Parameter isAlternative: 대체 단축키 사용 여부를 지정한다.
     /// - Returns: 대체 단축키 적용 여부를 반환한다. 1개라도 전환된 경우엔 true를, 모두 적용에 실패하면 false를 반환한다.
     @discardableResult
     func setAlternativeHorizontal(_ isAlternative: Bool) -> Bool {
-        // Root EdgeCommander 여부 확인
+        // Root Commander 여부 확인
         guard isRoot else { return false }
         return self.setAlternative(isAlternative, alterAxis: .horizontal, includeChildren: true)
     }
     /// 수직 대체 단축키 전환
-    /// - 모든 하위 EdgeCommander를 대체 단축키로 전환한다. 단, 대체 키가 지정된 EdgeCommander만 가능하다.
+    /// - 모든 하위 Commander를 대체 단축키로 전환한다. 단, 대체 키가 지정된 Commander만 가능하다.
     /// - Parameter isAlternative: 대체 단축키 사용 여부를 지정한다.
     /// - Returns: 대체 단축키 적용 여부를 반환한다. 1개라도 전환된 경우엔 true를, 모두 적용에 실패하면 false를 반환한다.
     @discardableResult
@@ -1026,7 +1026,7 @@ public class EdgeCommander: Codable,
     /// - Returns: 대체 단축키 적용 여부를 반환한다. 1개라도 전환된 경우엔 true를, 모두 적용에 실패하면 false를 반환한다.
     @discardableResult
     func setAlternativeHorizontal(at menuItems: Set<NSMenuItem>, _ isAlternative: Bool) -> Bool {
-        // Root EdgeCommander 여부 확인
+        // Root Commander 여부 확인
         guard isRoot else { return false }
         return self.setAlternative(at: menuItems, isAlternative, alterAxis: .horizontal)
     }
@@ -1037,7 +1037,7 @@ public class EdgeCommander: Codable,
     /// - Returns: 대체 단축키 적용 여부를 반환한다. 1개라도 전환된 경우엔 true를, 모두 적용에 실패하면 false를 반환한다.
     @discardableResult
     func setAlternativeVertical(at menuItems: Set<NSMenuItem>, _ isAlternative: Bool) -> Bool {
-        // Root EdgeCommander 여부 확인
+        // Root Commander 여부 확인
         guard isRoot else { return false }
         return self.setAlternative(at: menuItems, isAlternative, alterAxis: .vertical)
     }
@@ -1050,8 +1050,8 @@ public class EdgeCommander: Codable,
     @discardableResult
     private func setAlternative(at menuItems: Set<NSMenuItem>,
                                 _ isAlternative: Bool,
-                                alterAxis: EdgeCommander.Axis? = nil) -> Bool {
-        // Root EdgeCommander 여부 확인
+                                alterAxis: Commander.Axis? = nil) -> Bool {
+        // Root Commander 여부 확인
         guard isRoot else { return false }
         var success = false
         for menuItem in menuItems {
@@ -1067,10 +1067,10 @@ public class EdgeCommander: Codable,
     /// - Parameters:
     ///   - alterAixs: 전환할 대체 단축키의 방향을 지정한다. 널 값을 지정하면 수평/수직 방향을 가리지 않고 전체를 대체 키로 전환한다.
     ///   - isAlternative: 대체 단축키 사용 여부를 지정한다.
-    ///   - includeChildren: 하위 EdgeCommander도 대체 단축키로 전환할지 여부를 지정한다.
+    ///   - includeChildren: 하위 Commander도 대체 단축키로 전환할지 여부를 지정한다.
     /// - Returns: 대체 단축키 적용 여부를 반환한다. 1개라도 전환된 경우엔 true를, 모두 적용에 실패하면 false를 반환한다.
     @discardableResult
-    private func setAlternative(_ isAlternative: Bool, alterAxis: EdgeCommander.Axis?, includeChildren: Bool) -> Bool {
+    private func setAlternative(_ isAlternative: Bool, alterAxis: Commander.Axis?, includeChildren: Bool) -> Bool {
         
         // canAlternative가 false인 경우 중지
         guard self.canAlternative == true else {
@@ -1093,7 +1093,7 @@ public class EdgeCommander: Codable,
         // 대체 단축키 전환 방향 확인
         if let alterAxis = alterAxis {
             // self의 전환 방향이 동일하거나, none인 경우 전환 처리
-            if self.alternativeAxis == alterAxis || self.alternativeAxis == EdgeCommander.Axis.none {
+            if self.alternativeAxis == alterAxis || self.alternativeAxis == Commander.Axis.none {
                 success = setAlternative(isAlternative)
             }
             // 전환 방향이 다른 경우
@@ -1109,9 +1109,9 @@ public class EdgeCommander: Codable,
         
         // children 포함 전환시
         if includeChildren == true {
-            // 하위 EdgeCommander 존재 여부 확인
+            // 하위 Commander 존재 여부 확인
             guard let children = self.children else { return success }
-            // 하위 EdgeCommander도 동일하게 전환
+            // 하위 Commander도 동일하게 전환
             for commander in children {
                 if commander.setAlternative(isAlternative, alterAxis: alterAxis, includeChildren: true) == true {
                     // 하위 commander에서 변경 발생시 성공으로 간주
@@ -1132,20 +1132,20 @@ public class EdgeCommander: Codable,
         // 기존 스트링 제거
         self.shortcutReadable = nil
         // 새로운 숏컷 키 스트링 대입
-        self.shortcutReadable = EdgeCommander.shortcutReadable(modifiers: self.modifiers, key: self.key)
+        self.shortcutReadable = Commander.shortcutReadable(modifiers: self.modifiers, key: self.key)
         // 기존 대체 단축키 스트링 제거
         self.alternativeShortcutReadable = nil
         // 새로운 대체 숏컷 키 스트링 대입
-        self.alternativeShortcutReadable = EdgeCommander.shortcutReadable(modifiers: self.alternativeModifiers, key: self.alternativeKey)
+        self.alternativeShortcutReadable = Commander.shortcutReadable(modifiers: self.alternativeModifiers, key: self.alternativeKey)
     }
     
-    // MARK: Remove EdgeCommander
+    // MARK: Remove Commander
 
-    /// 특정 EdgeCommander를 children에서 재귀적으로 찾아서 제거한다
-    /// - Parameter commander: 제거하려는 하위 EdgeCommander로, 내부 children에 없으면 하위 EdgeCommander의 children을 계속 탐색한다.
+    /// 특정 Commander를 children에서 재귀적으로 찾아서 제거한다
+    /// - Parameter commander: 제거하려는 하위 Commander로, 내부 children에 없으면 하위 Commander의 children을 계속 탐색한다.
     /// - Returns: 제거 성공 여부를 반환한다.
     @discardableResult
-    func remove(_ commander: EdgeCommander) -> Bool {
+    func remove(_ commander: Commander) -> Bool {
         guard let children = self.children else { return false }
         guard let index = children.firstIndex(of: commander),
               0 ..< children.count ~= index else {
@@ -1162,19 +1162,19 @@ public class EdgeCommander: Codable,
     }
 }
 
-// MARK: - Copying Extensions for EdgeCommander
-extension EdgeCommander {
+// MARK: - Copying Extensions for Commander
+extension Commander {
     
     /// 복사 메쏘드
     public func copy(with zone: NSZone? = nil) -> Any {
         
-        var commander: EdgeCommander
+        var commander: Commander
         // 루트 아이템인 경우
         if self.isRoot == true {
             guard let menu else {
                 fatalError("\(#file):\(#function) :: 루트 아이템의 메뉴가 널값입니다.")
             }
-            commander = EdgeCommander(mainMenu: menu)
+            commander = Commander(mainMenu: menu)
         }
         else {
             // 서브메뉴 아이템인 경우
@@ -1182,11 +1182,11 @@ extension EdgeCommander {
                 guard let menu else {
                     fatalError("\(#file):\(#function) :: 서브메뉴 아이템의 메뉴가 널값입니다.")
                 }
-                commander = EdgeCommander.init(self.title, subMenu: menu)
+                commander = Commander.init(self.title, subMenu: menu)
             }
             // 일반 아이템인 경우
             else {
-                commander = EdgeCommander.init(self.menuItem!,
+                commander = Commander.init(self.menuItem!,
                                            key: self.key ?? self.menuItem!.keyEquivalent,
                                            modifierFlags: self.modifierFlags,
                                            canSwap: self.canSwap,
@@ -1200,10 +1200,10 @@ extension EdgeCommander {
         }
         
         if let children {
-            commander.children = [EdgeCommander]()
+            commander.children = [Commander]()
             for childCommander in children {
                 // child commander를 복사해서 children에 추가
-                commander.children?.append(childCommander.copy() as! EdgeCommander)
+                commander.children?.append(childCommander.copy() as! Commander)
             }
         }
         
@@ -1211,8 +1211,8 @@ extension EdgeCommander {
     }
 }
 
-// MARK: - Coding Extension for EdgeCommander
-extension EdgeCommander {
+// MARK: - Coding Extension for Commander
+extension Commander {
     
     /// 인코딩 메쏘드
     /// - Important: Action, Menu, MenuItem 등은 제외한다
@@ -1291,10 +1291,10 @@ extension EdgeCommander {
     }
 }
 
-// MARK: - Collection Extension for EdgeCommander
+// MARK: - Collection Extension for Commander
 
-/// 하위 EdgeCommander 반환을 위한 Collection 프로토콜 대응
-extension EdgeCommander: @MainActor Collection {
+/// 하위 Commander 반환을 위한 Collection 프로토콜 대응
+extension Commander: @MainActor Collection {
 
     public func index(after i: Int) -> Int {
         return i+1
@@ -1307,15 +1307,15 @@ extension EdgeCommander: @MainActor Collection {
             return self.children?.count ?? 0
         }
     }
-    /// 특정 인덱스의 EdgeCommander 반환
-    public subscript(index: Int)-> EdgeCommander? {
+    /// 특정 인덱스의 Commander 반환
+    public subscript(index: Int)-> Commander? {
         guard 0 ..< endIndex ~= index else {
             return nil
         }
         return self.children?[index]
     }
     
-    // MARK: Find EdgeCommander
+    // MARK: Find Commander
     
     /// # RootCommander 전용 메쏘드
     
@@ -1323,8 +1323,8 @@ extension EdgeCommander: @MainActor Collection {
     /// - Important: tag가 다른 `Commander`들이 있는 경우, 모두 찾아서 셋으로 묶어 반환한다.
     /// - Parameter action: 찾으려는 `Selector`를 지정한다.
     /// - Returns: 검색한 `Commander`를 셋으로 반환한다.
-    func find(action: Selector) -> Set<EdgeCommander>? {
-        var commanders = Set<EdgeCommander>()
+    func find(action: Selector) -> Set<Commander>? {
+        var commanders = Set<Commander>()
         
         // children 유무 확인
         guard let children = self.children else {
@@ -1350,12 +1350,12 @@ extension EdgeCommander: @MainActor Collection {
         return commanders
     }
     
-    /// 특정 action description 및 tag와 일치하는 EdgeCommander 반환 메쏘드
+    /// 특정 action description 및 tag와 일치하는 Commander 반환 메쏘드
     /// - Parameters:
     ///   - actionDescription: 검색할 action description 문자열.
     ///   - tag: 검색할 태그 값. 널값 지정 시 태그 검색은 생략한다.
     /// - Returns: 발견 시 해당 `Commander`를 반환하고, 미발견 시 널값을 반환한다.
-    func find(actionDescription: String, tag: Int?) -> EdgeCommander? {
+    func find(actionDescription: String, tag: Int?) -> Commander? {
         // children 유무 확인
         guard let children else {
             // 없는 경우, 자기 자신과 비교해서 맞는 경우 반환
@@ -1376,8 +1376,8 @@ extension EdgeCommander: @MainActor Collection {
 
     /// 특정 `NSMenuItem`을 격납한 `Commander` 반환
     /// - Parameter menuItem: 찾으려는 메뉴아이템.
-    /// - Returns: 해당 메뉴아이템을 격납한 EdgeCommander을 반환한다. 없는 경우 널값을 반환한다.
-    func find(menuItem: NSMenuItem) -> EdgeCommander? {
+    /// - Returns: 해당 메뉴아이템을 격납한 Commander을 반환한다. 없는 경우 널값을 반환한다.
+    func find(menuItem: NSMenuItem) -> Commander? {
         // children 유무 확인
         guard let children else {
             // 없는 경우, 자기 자신의 메뉴아이템과 비교해서 맞는 경우 반환
@@ -1399,7 +1399,7 @@ extension EdgeCommander: @MainActor Collection {
         return nil
     }
     
-    /// 주어진 키 값 및 보조 키와 일치하는 EdgeCommander 반환
+    /// 주어진 키 값 및 보조 키와 일치하는 Commander 반환
     /// - `NSEvent.ModifierFlags.intersection(.deviceIndependentFlagsMask) == 비교할 NSEvent.ModifierFlags` 라는 식으로 실행한다.
     /// - Important:
     ///   - [참고 링크](https://stackoverflow.com/questions/47255354/swift-4-bitwise-and-for-nsevent-modifierflags) 방식으로도 View에서 입력받은 ModifierFlags를 정확하게 파악할 수 없는 경우가 있다.
@@ -1408,15 +1408,15 @@ extension EdgeCommander: @MainActor Collection {
     ///   - key: 검색할 키 값을 지정한다.
     ///   - modifierFlags: `NSEvent.ModifierFlags`로 정의된 보조 키 값을 지정한다.
     /// - Returns: 발견 시 해당 `Commander`를 반환하고, 미발견 시 널값을 반환한다.
-    func find(key: String, modifierFlags: NSEvent.ModifierFlags?) -> EdgeCommander? {
+    func find(key: String, modifierFlags: NSEvent.ModifierFlags?) -> Commander? {
         return self.find(key: key, modifiers: modifierFlags?.toModifiers())
     }
-     /// 주어진 키 값 및 보조 키와 일치하는 EdgeCommander 반환 private 메쏘드
+     /// 주어진 키 값 및 보조 키와 일치하는 Commander 반환 private 메쏘드
     /// - Parameters:
     ///   - key: 검색할 키 값을 지정한다.
-    ///   - modifier: `EdgeCommander.Modifier` 셋으로 정의된 보조 키 값을 지정한다.
-    /// - Returns: 발견 시 해당 `EdgeCommander`를 반환하고, 미발견 시 널값을 반환한다.
-    private func find(key: String, modifiers: Set<EdgeCommander.Modifier>?) -> EdgeCommander? {
+    ///   - modifier: `Commander.Modifier` 셋으로 정의된 보조 키 값을 지정한다.
+    /// - Returns: 발견 시 해당 `Commander`를 반환하고, 미발견 시 널값을 반환한다.
+    private func find(key: String, modifiers: Set<Commander.Modifier>?) -> Commander? {
         // children 유무 확인
         guard let children = self.children else {
             // 없는 경우, 자기 자신과 비교해서 맞는 경우 반환
@@ -1454,43 +1454,43 @@ extension EdgeCommander: @MainActor Collection {
     
     /// # RootCommander 전용 메쏘드
     
-    /// 특정 단축키 조합과 일치하는 하위 EdgeCommander 반환
+    /// 특정 단축키 조합과 일치하는 하위 Commander 반환
     /// - Important:
-    ///   - findCommander가 다른 EdgeCommander 단축키와와 충돌하는지 여부를 탐색하는 것이 목적이다.
-    ///   - 즉, 단축키 조합을 변경하려 할 때, 변경하려는 조합과 일치하는 EdgeCommander가 있는지 여부를 확인하는 용도로 사용한다.
-    ///   - 이 메쏘드는 Root EdgeCommander 에서 실행해야 한다.
+    ///   - findCommander가 다른 Commander 단축키와와 충돌하는지 여부를 탐색하는 것이 목적이다.
+    ///   - 즉, 단축키 조합을 변경하려 할 때, 변경하려는 조합과 일치하는 Commander가 있는지 여부를 확인하는 용도로 사용한다.
+    ///   - 이 메쏘드는 Root Commander 에서 실행해야 한다.
     /// - Parameters:
     ///   - willChangeKey: 키 값을 지정한다.
-    ///   - willChangeModifiers: 보조 키를 `EdgeCommander.Modifier`의 셋으로 지정한다. 널값 지정이 가능하다.
-    ///   - willChangeCommander: 비교하려는 `EdgeCommander`를 지정한다.
+    ///   - willChangeModifiers: 보조 키를 `Commander.Modifier`의 셋으로 지정한다. 널값 지정이 가능하다.
+    ///   - willChangeCommander: 비교하려는 `Commander`를 지정한다.
     ///   - category: 비교하려는 카테고리(일반 키 / 전환 키 / 대체 키).
-    /// - Returns: `EdgeCommander` 및 검색 결과 종류(일반 키 / 대체 키 구분)를 `FoundCommanderResult`로 반환한다. 없는 경우 널값을 반환한다.
+    /// - Returns: `Commander` 및 검색 결과 종류(일반 키 / 대체 키 구분)를 `FoundCommanderResult`로 반환한다. 없는 경우 널값을 반환한다.
     func find(key willChangeKey: String,
-              modifiers willChangeModifiers: Set<EdgeCommander.Modifier>?,
-              of willChangeCommander: EdgeCommander,
-              _ category: EdgeCommander.Category) -> FoundCommander? {
+              modifiers willChangeModifiers: Set<Commander.Modifier>?,
+              of willChangeCommander: Commander,
+              _ category: Commander.Category) -> FoundCommander? {
         guard isRoot else {
-            EdgeLogger.shared.uiLogger.debug("\(#file):\(#function) :: Root EdgeCommander가 아닙니다.")
+            EdgeLogger.shared.uiLogger.debug("\(#file):\(#function) :: Root Commander가 아닙니다.")
             return nil
         }
         return _find(key: willChangeKey, modifiers: willChangeModifiers, of: willChangeCommander, category)
     }
-    /// 특정 단축키 조합과 일치하는 하위 EdgeCommander 반환 실제 메쏘드
+    /// 특정 단축키 조합과 일치하는 하위 Commander 반환 실제 메쏘드
     /// - Important:
-    ///   - 단축키 조합을 변경하려 할 때, 변경하려는 조합과 일치하는 EdgeCommander가 있는지 여부를 확인하는 용도로 사용한다.
-    ///   - 이 메쏘드는 하위 EdgeCommander를 재귀적으로 탐색하여 결과를 반환하는 실제 메쏘드다.
-    ///   - findCommander가 다른 EdgeCommander 단축키와와 충돌하는지 여부를 탐색하는 것이 목적이다.
+    ///   - 단축키 조합을 변경하려 할 때, 변경하려는 조합과 일치하는 Commander가 있는지 여부를 확인하는 용도로 사용한다.
+    ///   - 이 메쏘드는 하위 Commander를 재귀적으로 탐색하여 결과를 반환하는 실제 메쏘드다.
+    ///   - findCommander가 다른 Commander 단축키와와 충돌하는지 여부를 탐색하는 것이 목적이다.
     /// - Parameters:
     ///   - willChangeKey: 키 값을 지정한다.
     ///   - willChangeModifiers: 보조 키를 `Commander.Modifier`의 셋으로 지정한다. 널값 지정이 가능하다.
     ///   - shouldSwap: 방향 전환 가능 여부.
     ///   - shouldAlternative: 대체 단축키 사용 가능 여부.
     ///   - category: 비교하려는 카테고리(일반 키 / 전환 키 / 대체 단축키).
-    /// - Returns: 검색해낸 EdgeCommander와 종류(일반 키 / 대체 단축키 구분)를 `FoundCommanderResult`로 즉시 반환한다. 찾지 못한 경우, 널값을 반환한다.
+    /// - Returns: 검색해낸 Commander와 종류(일반 키 / 대체 단축키 구분)를 `FoundCommanderResult`로 즉시 반환한다. 찾지 못한 경우, 널값을 반환한다.
     func _find(key willChangeKey: String,
-               modifiers willChangeModifiers: Set<EdgeCommander.Modifier>?,
-               of willChangeCommander: EdgeCommander,
-               _ category: EdgeCommander.Category) -> FoundCommander? {
+               modifiers willChangeModifiers: Set<Commander.Modifier>?,
+               of willChangeCommander: Commander,
+               _ category: Commander.Category) -> FoundCommander? {
 
         // commander가 자기 자신인 경우 nil 반환
         guard self != willChangeCommander else {
@@ -1602,13 +1602,13 @@ extension EdgeCommander: @MainActor Collection {
         return nil
     }
     
-    /// 특정 Menu에 속한 하위 `EdgeCommander` 셋을 전부 반환
+    /// 특정 Menu에 속한 하위 `Commander` 셋을 전부 반환
     /// - Parameter menu: `NSMenu`를 지정한다.
-    /// - Returns: 주어진 메뉴에 속한 `EdgeCommander` 를 셋으로 반환한다.
-    func find(in menu: NSMenu) -> Set<EdgeCommander>? {
+    /// - Returns: 주어진 메뉴에 속한 `Commander` 를 셋으로 반환한다.
+    func find(in menu: NSMenu) -> Set<Commander>? {
         guard let children else { return nil }
         
-        var commanders = Set<EdgeCommander>()
+        var commanders = Set<Commander>()
         for commander in children {
             // menuItem의 menu를 비교
             if commander.menuItem?.menu == menu {
@@ -1628,22 +1628,22 @@ extension EdgeCommander: @MainActor Collection {
     }
 }
 
-// MARK: - Extensions for Restore EdgeCommander
-extension EdgeCommander {
+// MARK: - Extensions for Restore Commander
+extension Commander {
     
-    /// Root EdgeCommander에 복원된 Root EdgeCommander의 값을 적용해 복원한다
+    /// Root Commander에 복원된 Root Commander의 값을 적용해 복원한다
     /// - 복원된 Root 커맨더의 key, modifiers, swapKey, canSwap 여부를 적용한다.
-    /// - Parameter restoredRootCommander: 복원된 `EdgeCommander`를 지정한다.
-    func restore(compareWith restoredRootCommander: EdgeCommander) -> Void {
+    /// - Parameter restoredRootCommander: 복원된 `Commander`를 지정한다.
+    func restore(compareWith restoredRootCommander: Commander) -> Void {
         // restoredRootCommander가 root 가 아닌 경우 종료
         guard restoredRootCommander.isRoot == true else { return }
         // 설정 복원 실행
         self.restoreSettings(from: restoredRootCommander)
     }
-    /// 복원된 `EdgeCommander` 중, 자신과 동일한 `EdgeCommander`를 찾아서 세팅을 복원한다
+    /// 복원된 `Commander` 중, 자신과 동일한 `Commander`를 찾아서 세팅을 복원한다
     /// - action description 기준으로 검색을 실행한다.
-    /// - Parameter restoredCommander: 복원된 `EdgeCommander`를 지정한다.
-    private func restoreSettings(from restoredCommander: EdgeCommander) -> Void {
+    /// - Parameter restoredCommander: 복원된 `Commander`를 지정한다.
+    private func restoreSettings(from restoredCommander: Commander) -> Void {
         // parent인지 확인
         guard self.isParent == true else {
             // 자기 자신이 commander인 경우
@@ -1671,7 +1671,7 @@ extension EdgeCommander {
 }
 
 // MARK: - Extensions for Hashable
-extension EdgeCommander {
+extension Commander {
     
     /// 해쉬 값 생성
     public func hash(into hasher: inout Hasher) {
@@ -1681,7 +1681,7 @@ extension EdgeCommander {
     }
     
     /// 동등성 비교
-    public static func == (lhs: EdgeCommander, rhs: EdgeCommander) -> Bool {
+    public static func == (lhs: Commander, rhs: Commander) -> Bool {
         return lhs.id == rhs.id
     }
 }

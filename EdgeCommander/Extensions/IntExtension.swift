@@ -151,7 +151,7 @@ public extension UInt16 {
         case 33: return("[");
         case 34: return("i");
         case 35: return("p");
-        case 36: return EdgeCommander.SpecialKey.return.rawValue
+        case 36: return Commander.SpecialKey.return.rawValue
         case 37: return("l");
         case 38: return("j");
         case 39: return("'");
@@ -163,14 +163,14 @@ public extension UInt16 {
         case 45: return("n");
         case 46: return("m");
         case 47: return(".");
-        case 48: return EdgeCommander.SpecialKey.tab.rawValue
-        case 49: return EdgeCommander.SpecialKey.space.rawValue
+        case 48: return Commander.SpecialKey.tab.rawValue
+        case 49: return Commander.SpecialKey.space.rawValue
         case 50: return("`");
         // 백스페이스
-        case 51: return EdgeCommander.SpecialKey.backspace.rawValue
+        case 51: return Commander.SpecialKey.backspace.rawValue
         // Enter
-        case 52: return EdgeCommander.SpecialKey.return.rawValue
-        case 53: return EdgeCommander.SpecialKey.escape.rawValue
+        case 52: return Commander.SpecialKey.return.rawValue
+        case 53: return Commander.SpecialKey.escape.rawValue
 
         case 65: return(".");
         case 67: return("*");
@@ -183,7 +183,7 @@ public extension UInt16 {
         case 75: return("/");
             
         // 넘패드에 있는 엔터 키
-        case 76: return EdgeCommander.SpecialKey.return.rawValue
+        case 76: return Commander.SpecialKey.return.rawValue
             
         case 78: return("-");
         case 81: return("=");
@@ -230,7 +230,7 @@ public extension UInt16 {
             return NSPageUpFunctionKey.string
         // Delete: 풀사이즈 키보드의 넘패드에 있음
         case 117:
-            return EdgeCommander.SpecialKey.delete.rawValue
+            return Commander.SpecialKey.delete.rawValue
         case 118:
             return NSF4FunctionKey.string
         case 119:
@@ -243,16 +243,16 @@ public extension UInt16 {
             return NSF1FunctionKey.string
         // 왼쪽 화살표
         case 123:
-            return EdgeCommander.SpecialKey.left.rawValue
+            return Commander.SpecialKey.left.rawValue
         // 오른쪽 화살표
         case 124:
-            return EdgeCommander.SpecialKey.right.rawValue
+            return Commander.SpecialKey.right.rawValue
         // 아래쪽 화살표
         case 125:
-            return EdgeCommander.SpecialKey.down.rawValue
+            return Commander.SpecialKey.down.rawValue
         // 위쪽 화살표
         case 126:
-            return EdgeCommander.SpecialKey.up.rawValue
+            return Commander.SpecialKey.up.rawValue
             
         default:
             return nil
