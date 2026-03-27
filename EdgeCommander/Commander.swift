@@ -30,9 +30,9 @@ typealias FoundCommander = (commander: Commander, category: Commander.Category)
 /// - Important: 메인 쓰레드에서 실행하기 위해 @MainActor 매크로를 추가한다.
 @MainActor
 public class Commander: Codable,
-                            NSCopying,
-                            Identifiable,
-                            Hashable {
+                        NSCopying,
+                        Identifiable,
+                        Hashable {
     
     // MARK: - Static Method for Making Shortcut String
     /// 특정 Key과 Modifiers 조합으로 단축키 스트링을 생성하는 Static 메쏘드
@@ -180,6 +180,22 @@ public class Commander: Codable,
         case horizontal
         /// 수직 전환 (위/아래)
         case vertical
+        
+        /// Scrollable Axis를 Commander Axis로 변환
+        /// - Parameter scrollable: `Scrollable.Axis`로 스크롤 가능한 축 방향을 지정한다.
+        /// - Returns: `Commander.Axis` 배열을 반환한다.
+        public func axis(from scrollable: Scrollable.Axis) -> [Axis]? {
+            switch scrollable {
+                /// 전방향 스크롤 가능 시
+            case .all: return [.horizontal, .vertical]
+                /// 수평 스크롤 가능 시
+            case .horizontal: return [.horizontal]
+                /// 수직 스크롤 가능 시
+            case .vertical: return [.vertical]
+                /// 스크롤 불가 시
+            default: return nil
+            }
+        }
     }
     /// Label
     /// - 테이블 뷰 Identifier 및 헤더에 사용되는 라벨
