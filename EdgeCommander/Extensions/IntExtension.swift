@@ -32,7 +32,7 @@ extension UInt32 {
     
     /// 특수 키를 표시 가능한 형태로 반환
     /// - Returns: 특수 키를 표시 가능한 스트링으로 반환하고, 특수 키가 아닌 경우에는 널값을 반환한다.
-    func getSpecialKeyReadable() -> String? {
+    func specialKeyReadable() -> String? {
         switch (Int(self)) {
             
             // F1~F15까지

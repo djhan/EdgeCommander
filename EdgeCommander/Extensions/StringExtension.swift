@@ -46,7 +46,7 @@ public extension String {
             }
             // 유니코드 기반으로 special 키 여부 확인
             if let unicode = UnicodeScalar(self)?.value,
-               let specialKeyReadable = unicode.getSpecialKeyReadable(),
+               let specialKeyReadable = unicode.specialKeyReadable(),
                // specialKey의 readable 값과 직접 비교
                // $0.rawValue 의 readable 값과 비교하면 무한 루프에 빠질 수 있으니 주의!
                 $0.readable == specialKeyReadable {
@@ -70,7 +70,7 @@ public extension String {
         }
         // 유니코드 기반으로 Special 키인지 확인
         guard let unicode = UnicodeScalar(self)?.value,
-              let specialKeyReadable = unicode.getSpecialKeyReadable() else {
+              let specialKeyReadable = unicode.specialKeyReadable() else {
             // 일반 캐릭터인 경우 대문자 반환
             return self.uppercased()
         }
