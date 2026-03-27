@@ -7,12 +7,12 @@
 		<key>EdgeCommander.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>29</integer>
+			<integer>14</integer>
 		</dict>
 		<key>EdgeCommanderTestApp.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>19</integer>
+			<integer>15</integer>
 		</dict>
 	</dict>
 </dict>
