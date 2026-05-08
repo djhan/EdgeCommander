@@ -272,7 +272,7 @@ public class CommanderCoordinator {
         let encoder = PropertyListEncoder()
         guard let rootCommander,
               let data = try? encoder.encode(rootCommander) else {
-            EdgeLogger.shared.uiLogger.error("\(#file):\(#function) :: Root Commander가 없거나 데이터 변환에 실패했습니다.")
+            EdgeLogger.shared.uiLogger.error("\(#function):\(#line) :: Root Commander가 없거나 데이터 변환에 실패했습니다.")
             return false
         }
         
@@ -296,7 +296,7 @@ public class CommanderCoordinator {
         
         let decoder = PropertyListDecoder()
         guard let restoredRootCommander = try? decoder.decode(Commander.self, from: data) else {
-            EdgeLogger.shared.uiLogger.error("\(#file):\(#function) :: Root Commander 복원에 실패했습니다.")
+            EdgeLogger.shared.uiLogger.error("\(#function):\(#line) :: Root Commander 복원에 실패했습니다.")
             // 복원할 Commander가 없는 경우, 현재 Root Commander를 저장한다
             save(saveHandler)
             // 실패 반환
@@ -318,7 +318,7 @@ public class CommanderCoordinator {
         // 현재 Root Commander 와 Default Commander를 확인
         guard let rootCommander,
               let defaultCommander else {
-            EdgeLogger.shared.uiLogger.error("\(#file):\(#function) :: Root Commander 기본값 복원에 실패했습니다.")
+            EdgeLogger.shared.uiLogger.error("\(#function):\(#line) :: Root Commander 기본값 복원에 실패했습니다.")
             // 없는 경우 종료 처리
             return false
         }

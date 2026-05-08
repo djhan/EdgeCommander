@@ -639,7 +639,7 @@ public class Commander: Codable,
         var children = [Commander]()
         
         guard let menu = self.menu else {
-            EdgeLogger.shared.uiLogger.debug("\(#file):\(#function) :: 하위 Commander를 추가할 수 없습니다. 메뉴가 없습니다.")
+            EdgeLogger.shared.uiLogger.debug("\(#function):\(#line) :: 하위 Commander를 추가할 수 없습니다. 메뉴가 없습니다.")
             return false
         }
         
@@ -649,7 +649,7 @@ public class Commander: Codable,
             func addChild() {
                 // initializeHandler 로 commander 생성
                 guard let commander = initializeHandler(menuItem) else {
-                    EdgeLogger.shared.uiLogger.debug("\(#file):\(#function) :: initializeHandler로 하위 Commander를 생성할 수 없습니다.")
+                    EdgeLogger.shared.uiLogger.debug("\(#function):\(#line) :: initializeHandler로 하위 Commander를 생성할 수 없습니다.")
                     // 다음 아이템으로 이동
                     return
                 }
@@ -813,20 +813,20 @@ public class Commander: Codable,
 
             if menuItem.keyEquivalent != key,
                menuItem.keyEquivalent.readable != key?.readable {
-                EdgeLogger.shared.uiLogger.debug("\(#file):\(#function) :: \(menuItem.title) >> Swap 여부 = \(self.isSwap), \(menuItem.keyEquivalent.readable) => \(key?.readable ?? "none")")
+                EdgeLogger.shared.uiLogger.debug("\(#function):\(#line) :: \(menuItem.title) >> Swap 여부 = \(self.isSwap), \(menuItem.keyEquivalent.readable) => \(key?.readable ?? "none")")
                 // 키값 업데이트
                 menuItem.keyEquivalent = key!
             }
         }
         else {
-            EdgeLogger.shared.uiLogger.debug("\(#file):\(#function) :: \(menuItem.title) >> 키 값이 없습니다.")
+            EdgeLogger.shared.uiLogger.debug("\(#function):\(#line) :: \(menuItem.title) >> 키 값이 없습니다.")
             // 키가 NIL 인 경우 공백 삽입
             menuItem.keyEquivalent = ""
         }
         
         // 편집 키 변경 발생시 업데이트
         if menuItem.keyEquivalentModifierMask != modifierFlags {
-            EdgeLogger.shared.uiLogger.debug("\(#file):\(#function) :: \(menuItem.title) >> \(menuItem.keyEquivalentModifierMask.rawValue) => \(modifierFlags.rawValue) 로 보조 키 변경.")
+            EdgeLogger.shared.uiLogger.debug("\(#function):\(#line) :: \(menuItem.title) >> \(menuItem.keyEquivalentModifierMask.rawValue) => \(modifierFlags.rawValue) 로 보조 키 변경.")
             menuItem.keyEquivalentModifierMask = modifierFlags
         }
         
@@ -1179,7 +1179,7 @@ extension Commander {
         // 루트 아이템인 경우
         if self.isRoot == true {
             guard let menu else {
-                fatalError("\(#file):\(#function) :: 루트 아이템의 메뉴가 널값입니다.")
+                fatalError("\(#function):\(#line) :: 루트 아이템의 메뉴가 널값입니다.")
             }
             // [ISSUE B FIXED] Commander(mainMenu: menu) 대신 수동 초기화하여 addChild() 중복 실행 방지
             commander = Commander(Commander.Label.mainMenu.rawValue)
@@ -1191,7 +1191,7 @@ extension Commander {
             // 서브메뉴 아이템인 경우
             if self.isParent == true {
                 guard let menu else {
-                    fatalError("\(#file):\(#function) :: 서브메뉴 아이템의 메뉴가 널값입니다.")
+                    fatalError("\(#function):\(#line) :: 서브메뉴 아이템의 메뉴가 널값입니다.")
                 }
                 commander = Commander.init(self.title, subMenu: menu)
             }
@@ -1481,7 +1481,7 @@ extension Commander: @MainActor Collection {
               of willChangeCommander: Commander,
               _ category: Commander.Category) -> FoundCommander? {
         guard isRoot else {
-            EdgeLogger.shared.uiLogger.debug("\(#file):\(#function) :: Root Commander가 아닙니다.")
+            EdgeLogger.shared.uiLogger.debug("\(#function):\(#line) :: Root Commander가 아닙니다.")
             return nil
         }
         return _find(key: willChangeKey, modifiers: willChangeModifiers, of: willChangeCommander, category)

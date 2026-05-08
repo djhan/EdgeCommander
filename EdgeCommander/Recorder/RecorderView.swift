@@ -564,7 +564,7 @@ extension RecorderView {
         guard isEnabled else { return false }
         if let delegate = delegate, !delegate.recorderViewShouldBeginRecording(self) {
             NSSound.beep()
-            EdgeLogger.shared.uiLogger.error("\(#file):\(#function) :: isEnabled == false")
+            EdgeLogger.shared.uiLogger.error("\(#function):\(#line) :: isEnabled == false")
             return false
         }
         isRecording = true
