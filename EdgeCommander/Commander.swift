@@ -1688,8 +1688,6 @@ extension Commander {
     /// 해쉬 값 생성
     /// - [ISSUE C 주의] 복제된 객체나 디코딩된 객체는 고유 UUID가 변경되므로 Set/Dictionary 활용 시 기존 객체 요소와 매칭되지 않습니다.
     public func hash(into hasher: inout Hasher) {
-        //hasher.combine(self.action)
-        //hasher.combine(self.tag)
         hasher.combine(self.id)
     }
     
