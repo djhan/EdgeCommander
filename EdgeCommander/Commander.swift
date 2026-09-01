@@ -258,7 +258,7 @@ public class Commander: Codable,
     var tag: Int = 0
     
     /// 상하/좌우 전환시 바꿔치기 대응 여부
-    var canSwap: Bool = false
+    public var canSwap: Bool = false
     /// 상하/좌우 전환 여부
     var isSwap = false
     /// 실제 상하/좌우 전환 가능 여부
@@ -387,7 +387,7 @@ public class Commander: Codable,
     
     /// 대체 단축키 사용 가능 여부
     /// - 특수 키(SpecialKey) 단독 사용 시에 true를 반환한다.
-    var canAlternative: Bool {
+    public var canAlternative: Bool {
         // 최상위 Root Commander는 하위 Commander 변경이 가능하도록 true 를 반환한다.
         if self.isRoot == true { return true }
         // 하위 chidren이 있는 경우도 true 를 반환한다.
